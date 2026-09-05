@@ -90,22 +90,22 @@ section { scroll-margin-top: 95px; }
 .service-card h3 { font-size: 1.12rem; margin: 10px auto 9px; min-height: 41px; }
 .service-link { align-items: center; color: var(--blue); display: flex; font-size: .7rem; font-weight: 850; gap: 1px; justify-content: center; padding: 4px 2px 1px; }
 .service-link svg { height: 15px; transition: transform 180ms ease; width: 15px; }
-.service-card.is-active .service-link svg { transform: rotate(90deg); }
-.service-reveal { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 330ms cubic-bezier(.22,1,.36,1), opacity 220ms ease, margin-top 330ms ease; }
-.service-reveal.is-open { grid-template-rows: 1fr; margin-top: 24px; opacity: 1; }
-.service-reveal-inner { min-height: 0; overflow: hidden; }
-.service-reveal-panel { animation: serviceRevealIn 360ms cubic-bezier(.22,1,.36,1); background: #fff; border: 1px solid #c9d9ec; border-radius: 18px; box-shadow: var(--shadow-card); display: grid; grid-template-columns: minmax(300px, .88fr) minmax(0, 1.12fr); overflow: hidden; }
-.service-reveal-image { min-height: 350px; overflow: hidden; position: relative; }
-.service-reveal-image::after { background: linear-gradient(90deg, transparent 70%, rgba(255,255,255,.18)); content: ""; inset: 0; pointer-events: none; position: absolute; }
-.service-reveal-image img { object-fit: cover; }
-.service-reveal-copy { align-self: center; padding: 38px 44px; }
-.service-reveal-copy h3 { font-size: clamp(2rem, 3vw, 3rem); margin-bottom: 22px; }
+.service-card:hover .service-link svg { transform: translateX(3px); }
+.service-modal-backdrop { align-items: center; backdrop-filter: blur(10px); background: rgba(1,12,30,.78); display: flex; inset: 0; justify-content: center; padding: 28px; perspective: 1400px; position: fixed; z-index: 110; }
+.service-dialog { animation: serviceDialogIn 380ms cubic-bezier(.22,1,.36,1); background: #fff; border: 1px solid rgba(255,255,255,.5); border-radius: 22px; box-shadow: 0 35px 100px rgba(0,0,0,.42); display: grid; grid-template-columns: minmax(340px, .9fr) minmax(0, 1.1fr); max-height: calc(100vh - 56px); max-width: 1060px; outline: none; overflow: auto; position: relative; width: 100%; }
+.service-dialog-close { background: rgba(255,255,255,.96); box-shadow: 0 5px 18px rgba(3,27,67,.16); position: absolute; right: 18px; top: 18px; z-index: 3; }
+.service-dialog-image { min-height: 520px; overflow: hidden; position: relative; }
+.service-dialog-image::after { background: linear-gradient(0deg, rgba(3,27,67,.64), transparent 34%); content: ""; inset: 0; pointer-events: none; position: absolute; }
+.service-dialog-image img { object-fit: cover; }
+.service-dialog-image > span { bottom: 22px; color: #fff; font-size: .72rem; font-weight: 850; left: 24px; letter-spacing: .1em; position: absolute; text-transform: uppercase; z-index: 2; }
+.service-dialog-copy { align-self: center; padding: 56px 52px 48px; }
+.service-dialog-copy h2 { font-size: clamp(2.4rem, 4vw, 4rem); margin-bottom: 27px; padding-right: 30px; }
 .service-problem-list { display: grid; gap: 12px 24px; grid-template-columns: repeat(2, minmax(0, 1fr)); list-style: none; margin: 0 0 22px; padding: 0; }
 .service-problem-list li { align-items: flex-start; color: #34445a; display: flex; font-size: .88rem; font-weight: 720; gap: 9px; line-height: 1.45; }
 .service-problem-list svg { color: var(--orange); flex: 0 0 auto; height: 19px; margin-top: 1px; width: 19px; }
-.service-reveal-note { color: var(--muted); font-size: .82rem; margin-bottom: 24px; max-width: 580px; }
-.service-reveal-copy .button-3d svg { height: 18px; width: 18px; }
-@keyframes serviceRevealIn { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: translateY(0); } }
+.service-dialog-note { color: var(--muted); font-size: .84rem; margin-bottom: 26px; max-width: 580px; }
+.service-dialog-cta svg { height: 18px; width: 18px; }
+@keyframes serviceDialogIn { from { opacity: 0; transform: translateY(26px) scale(.93) rotateX(-5deg); } to { opacity: 1; transform: translateY(0) scale(1) rotateX(0); } }
 .section-link { display: flex; margin: 28px auto 0; }
 .why-section { background: linear-gradient(145deg, #f1f6fc, #fff); border: 1px solid #e8eef6; border-radius: 22px; box-shadow: var(--shadow-soft); margin-bottom: 22px; padding-left: 34px; padding-right: 34px; }
 .benefit-grid { display: grid; gap: 20px; grid-template-columns: repeat(5, 1fr); }
@@ -268,10 +268,14 @@ section { scroll-margin-top: 95px; }
   .service-card { min-height: 178px; padding: 17px 7px 14px; } .service-card h3 { font-size: .98rem; margin-top: 6px; }
   .service-icon { height: 61px; } .service-icon svg { height: 54px; width: 54px; }
   .service-link { font-size: .63rem; }
-  .service-reveal-panel { grid-template-columns: 1fr; }
-  .service-reveal-image { min-height: 250px; }
-  .service-reveal-copy { padding: 28px 22px 31px; }
+  .service-modal-backdrop { align-items: flex-end; padding: 18px 0 0; }
+  .service-dialog { border-bottom-left-radius: 0; border-bottom-right-radius: 0; grid-template-columns: 1fr; max-height: calc(100dvh - 18px); }
+  .service-dialog-close { right: 14px; top: 14px; }
+  .service-dialog-image { min-height: 235px; }
+  .service-dialog-copy { padding: 30px 22px 32px; }
+  .service-dialog-copy h2 { font-size: 2.35rem; margin-bottom: 21px; padding-right: 0; }
   .service-problem-list { grid-template-columns: 1fr; }
+  .service-dialog-cta { width: 100%; }
   .why-section { border-radius: 0; margin-bottom: 0; padding-left: 18px; padding-right: 18px; }
   .benefit-grid, .process-list { grid-template-columns: 1fr; } .process-list li { padding: 0 20px; }
   .area-section { gap: 32px; } .area-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }

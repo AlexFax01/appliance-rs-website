@@ -10,8 +10,10 @@
 
 - Side-by-side hero comparison: `design/qa/hero-comparison-v3.png`
 - Side-by-side appliance-section comparison: `design/qa/services-comparison-v1.png`
+- Side-by-side appliance-modal comparison: `design/qa/services-modal-comparison-v1.png`
 - Icon-only appliance state: `design/qa/services-collapsed-v1.png`
-- Expanded washer/dryer state: `design/qa/services-expanded-v1.png`
+- Desktop washer/dryer modal: `design/qa/services-modal-desktop-v1.png`
+- Mobile washer/dryer modal: `design/qa/services-modal-mobile-v1.png`
 - Desktop/tablet viewport: `design/qa/home-viewport-v3.png`
 - Mobile viewport: `design/qa/home-mobile-v2.png`
 - Hero uses a purpose-built photorealistic asset rather than a placeholder.
@@ -22,10 +24,11 @@
 - Sticky header, active section behavior, responsive navigation, and mobile contact bar render correctly.
 - Call/Text chooser opens as an accessible dialog and closes with Escape.
 - Appliance cards preserve the approved six-category icon row while keeping all service photos hidden until selection.
-- Clicking a category opens one animated detail panel with the matching real photo, four typical problems, and an appliance-specific request button.
-- Selecting another category swaps the detail content; selecting the active category again collapses it.
-- The detail CTA scrolls to the callback form and preselects the matching appliance.
-- The appliance interaction was verified at desktop and mobile widths with no horizontal overflow.
+- Clicking a category opens an animated, in-viewport detail modal with the matching real photo, four typical problems, and an appliance-specific request button; no scroll below the icon row is required.
+- The modal is centered at desktop widths and becomes a near-full-height bottom sheet on mobile.
+- Escape, the close button, and the dimmed backdrop close the modal; keyboard focus returns to the selected appliance card.
+- The detail CTA closes the modal, scrolls to the callback form, and preselects the matching appliance.
+- The appliance interaction was verified at desktop and mobile widths with no horizontal overflow or browser-console errors.
 - Full service-area toggle exposes all 19 named areas.
 - FAQ accordion opens and reveals its answer.
 - Callback form accepts a valid local QA payload and reports honest preview-only delivery status when SMTP is not configured.

@@ -13,6 +13,7 @@ import {
 import { appliances, business, faqs, reviews, serviceAreas } from "@/content/site";
 import { ContactChooser } from "./ContactChooser";
 import { ContactForm } from "./ContactForm";
+import { ServiceDialog } from "./ServiceDialog";
 
 const navItems = [
   ["home", "Home"], ["appliances", "Appliances We Repair"], ["process", "Our Process"],
@@ -112,39 +113,19 @@ export function ApplianceWebsite() {
               const isExpanded = expandedAppliance === item.value;
               return (
                 <button
-                  aria-controls="appliance-repair-details"
+                  aria-haspopup="dialog"
                   aria-expanded={isExpanded}
                   className={`service-card${isExpanded ? " is-active" : ""}`}
                   key={item.value}
-                  onClick={() => setExpandedAppliance((current) => current === item.value ? null : item.value)}
+                  onClick={() => setExpandedAppliance(item.value)}
                   type="button"
                 >
                   <span aria-hidden="true" className="service-icon"><HugeiconsIcon icon={applianceIcons[index]} strokeWidth={1.8} /></span>
                   <h3>{item.title}</h3>
-                  <span className="service-link">{isExpanded ? "Hide details" : "View common repairs"}<IconChevronRight /></span>
+                  <span className="service-link">View common repairs <IconChevronRight /></span>
                 </button>
               );
             })}
-          </div>
-          <div aria-hidden={!expandedApplianceDetails} className={`service-reveal${expandedApplianceDetails ? " is-open" : ""}`} id="appliance-repair-details">
-            <div className="service-reveal-inner">
-              {expandedApplianceDetails ? (
-                <article className="service-reveal-panel" key={expandedApplianceDetails.value}>
-                  <div className="service-reveal-image">
-                    <Image alt={expandedApplianceDetails.alt} fill sizes="(max-width: 760px) 100vw, 45vw" src={expandedApplianceDetails.image} />
-                  </div>
-                  <div className="service-reveal-copy">
-                    <p className="eyebrow">Typical problems we repair</p>
-                    <h3>{expandedApplianceDetails.title}</h3>
-                    <ul className="service-problem-list">
-                      {expandedApplianceDetails.problems.map((problem) => <li key={problem}><IconCircleCheck />{problem}</li>)}
-                    </ul>
-                    <p className="service-reveal-note">Tell us the brand, model, and what the appliance is doing. We’ll confirm service availability and the next step.</p>
-                    <button className="button-3d button-primary" onClick={() => requestCallback(expandedApplianceDetails.value)} type="button">Request {expandedApplianceDetails.title} repair <IconArrowRight /></button>
-                  </div>
-                </article>
-              ) : null}
-            </div>
           </div>
           <button className="text-action section-link" onClick={() => requestCallback("other")} type="button">Ask about another appliance <IconArrowRight /></button>
         </section>
@@ -220,6 +201,7 @@ export function ApplianceWebsite() {
       </footer>
 
       <div className="mobile-contact-bar"><a href={`tel:${business.phoneHref}`}><IconPhone /> Call</a><a href={`sms:${business.phoneHref}`}><IconMessageCircle /> Text</a><button onClick={() => requestCallback()} type="button">Request callback</button></div>
+      <ServiceDialog onClose={() => setExpandedAppliance(null)} onRequest={requestCallback} service={expandedApplianceDetails} />
       <ContactChooser onClose={() => setContactOpen(false)} onRequestCallback={() => requestCallback()} open={contactOpen} />
     </>
   );
