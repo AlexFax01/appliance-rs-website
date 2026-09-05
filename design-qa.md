@@ -3,8 +3,8 @@
 ## Seven-improvement release — September 5, 2026
 
 - Preserved the page order, blue identity, original six outline icons, real appliance photos, and modal interaction.
-- 19 unit/server tests passed: legacy JSON, selected-only requests, cross-category/duplicate IDs, unknown ZIP acceptance, 0/1/3 photos, fourth-file rejection, corrupt/spoofed MIME, oversize bodies/files, and missing/failed mocked SMTP.
-- 10 PHP checks passed using an isolated FrankenPHP 8.5.10 runtime (GD/fileinfo/mbstring enabled) and a test-only mail transport. No customer mail was sent. The temporary fixture is separate from the release package.
+- 20 unit/server tests passed: legacy JSON, selected-only requests, cross-category/duplicate IDs, unknown ZIP acceptance, 0/1/3 photos, fourth-file rejection, corrupt/spoofed MIME, oversize bodies/files, bounded recompression of a detailed JPEG, and missing/failed mocked SMTP.
+- 11 PHP checks passed using an isolated FrankenPHP 8.5.10 runtime (GD/fileinfo/mbstring enabled) and a test-only mail transport. No customer mail was sent. The temporary fixture is separate from the release package.
 - 10 Playwright scenarios passed on each build target (desktop and mobile): all six modals, problem/ZIP handoff, both review tabs, focus cycling in both directions and return, reduced motion, selected-only submissions, 3-photo cap, HEIC fallback, remove, failed-mail retention, retry, and readable model-label compression. Axe checks passed for pricing and service modals.
 - Model-label test: 3200×2400 PNG → 2400×1800 JPEG, below 1 MB; model and serial text visually verified readable. This cannot guarantee readability of an originally blurred photo.
 - Verified exact Google Maps company and South Carolina service area visually. No iframe is requested until the map button is clicked.

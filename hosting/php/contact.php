@@ -92,7 +92,11 @@ if ($uploads !== null) {
         $resized = imagecreatetruecolor((int)round($info[0] * $scale), (int)round($info[1] * $scale));
         imagefill($resized, 0, 0, imagecolorallocate($resized, 255, 255, 255));
         imagecopyresampled($resized, $image, 0, 0, 0, 0, imagesx($resized), imagesy($resized), $info[0], $info[1]);
-        ob_start(); imagejpeg($resized, null, 85); $bytes = (string)ob_get_clean();
+        $bytes = '';
+        foreach ([85, 70, 55] as $quality) {
+            ob_start(); imagejpeg($resized, null, $quality); $bytes = (string)ob_get_clean();
+            if (strlen($bytes) <= 1000000) break;
+        }
         imagedestroy($image); imagedestroy($resized);
         if (!$bytes || strlen($bytes) > 1000000) respond(400, ['ok' => false, 'code' => 'invalid_photo_size']);
         $attachments[] = $bytes;

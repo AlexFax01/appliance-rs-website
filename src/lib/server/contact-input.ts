@@ -39,7 +39,13 @@ export async function parseContactRequest(request: Request): Promise<{raw: unkno
       const input = sharp(Buffer.from(await file.arrayBuffer()), {limitInputPixels: 12_000_000, failOn: "warning"});
       const info = await input.metadata();
       if (info.format !== mimeFormats[file.type] || (info.pages ?? 1) > 1) throw new Error("Invalid format");
-      const content = await input.rotate().resize({width: 2400, height: 2400, fit: "inside", withoutEnlargement: true}).jpeg({quality: 85}).toBuffer();
+      const normalized = input.rotate().resize({width: 2400, height: 2400, fit: "inside", withoutEnlargement: true});
+      let content = await normalized.clone().jpeg({quality: 85}).toBuffer();
+      // Re-encoding an already compressed JPEG at a higher quality can inflate it.
+      for (const quality of [70, 55]) {
+        if (content.length <= MAX_PHOTO_BYTES) break;
+        content = await normalized.clone().jpeg({quality}).toBuffer();
+      }
       if (content.length > MAX_PHOTO_BYTES) throw new Error("Photo too large");
       attachments.push({filename: `appliance-photo-${index + 1}.jpg`, content, contentType: "image/jpeg"});
     } catch {throw new InputError("invalid_photo", "A photo could not be read. Please remove it or choose another JPEG, PNG, or WebP photo.");}

@@ -4,6 +4,8 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {spawn} from 'node:child_process';
 import assert from 'node:assert/strict';
+import sharp from 'sharp';
+import {randomBytes} from 'node:crypto';
 const runtime=process.env.PHP_TEST_RUNTIME;
 if(!runtime) throw new Error('Set PHP_TEST_RUNTIME to a FrankenPHP executable');
 const root=await mkdtemp(join(tmpdir(),'appliance-php-test-'));
@@ -25,6 +27,8 @@ try{
  for(let i=0;i<50;i++){try{await fetch('http://127.0.0.1:3199/contact.php');break;}catch{await new Promise(resolve=>setTimeout(resolve,100));}}
  for(const n of [0,1,3]){assert.equal((await send(valid,n)).status,200);const mail=JSON.parse(await readFile(capture,'utf8'));assert.equal(mail.attachments.length,n);assert.match(mail.body,/TEST-123/);checks++;}
  assert.equal((await send(valid,4)).status,400);checks++;
+ const detailed=await sharp(randomBytes(1536*1152*3),{raw:{width:1536,height:1152,channels:3}}).jpeg({quality:70}).toBuffer();
+ assert.equal((await send(valid,1,detailed,'image/jpeg')).status,200);assert.ok(JSON.parse(await readFile(capture,'utf8')).attachments[0].size<=1_000_000);checks++;
  assert.equal((await send(valid,1,Buffer.from('bad'),'image/jpeg')).status,400);checks++;
  assert.equal((await send(valid,1,Buffer.alloc(1_000_001))).status,400);checks++;
  assert.equal((await send({...valid,selectedProblemIds:['fridge-not-cooling']})).status,400);checks++;
