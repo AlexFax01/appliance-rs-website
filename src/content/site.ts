@@ -10,12 +10,48 @@ export const business = {
 };
 
 export const appliances = [
-  { value: "refrigerator-freezer", title: "Refrigerator / Freezer", image: "/images/services/refrigerator-freezer.avif", alt: "Stainless steel refrigerator and freezer in a bright kitchen" },
-  { value: "ice-maker", title: "Ice Maker", image: "/images/services/ice-maker.avif", alt: "Residential under-counter ice maker" },
-  { value: "washer-dryer", title: "Washer / Dryer", image: "/images/services/washer-dryer.avif", alt: "Front-loading washer and dryer" },
-  { value: "dishwasher-disposal", title: "Dishwasher / Disposal", image: "/images/services/dishwasher-disposal.avif", alt: "Open stainless steel dishwasher" },
-  { value: "oven-cooktop", title: "Oven / Cooktop", image: "/images/services/oven-cooktop.avif", alt: "Stainless steel range and oven" },
-  { value: "microwave", title: "Microwave", image: "/images/services/microwave.avif", alt: "Built-in stainless steel microwave" },
+  {
+    value: "refrigerator-freezer",
+    title: "Refrigerator / Freezer",
+    image: "/images/services/refrigerator-freezer.avif",
+    alt: "Stainless steel refrigerator and freezer in a bright kitchen",
+    problems: ["Not cooling or freezing", "Ice buildup or leaking water", "Noisy compressor or fan", "Door seal or temperature-control issues"],
+  },
+  {
+    value: "ice-maker",
+    title: "Ice Maker",
+    image: "/images/services/ice-maker.avif",
+    alt: "Residential under-counter ice maker",
+    problems: ["Not making ice", "Small or misshapen ice cubes", "Water leaks or a frozen supply line", "Dispenser or inlet-valve issues"],
+  },
+  {
+    value: "washer-dryer",
+    title: "Washer / Dryer",
+    image: "/images/services/washer-dryer.avif",
+    alt: "Front-loading washer and dryer",
+    problems: ["Washer not draining or spinning", "Dryer not heating or taking too long", "Belt, drum, pump, or bearing replacement", "Leaks, vibration, or unusual noise"],
+  },
+  {
+    value: "dishwasher-disposal",
+    title: "Dishwasher / Disposal",
+    image: "/images/services/dishwasher-disposal.avif",
+    alt: "Open stainless steel dishwasher",
+    problems: ["Dishes stay dirty or wet", "Dishwasher not draining or leaking", "Pump, spray-arm, or seal problems", "Disposal jam, leak, or motor failure"],
+  },
+  {
+    value: "oven-cooktop",
+    title: "Oven / Cooktop",
+    image: "/images/services/oven-cooktop.avif",
+    alt: "Stainless steel range and oven",
+    problems: ["Oven not heating evenly", "Burner or element not working", "Igniter, thermostat, or sensor replacement", "Temperature-control or electrical issues"],
+  },
+  {
+    value: "microwave",
+    title: "Microwave",
+    image: "/images/services/microwave.avif",
+    alt: "Built-in stainless steel microwave",
+    problems: ["Not heating", "Turntable, light, or fan not working", "Door switch or control-panel issues", "Unusual noise, sparks, or shutdowns"],
+  },
 ] as const;
 
 export const serviceAreas = [

@@ -3,11 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { DishWasherIcon, MicrowaveIcon, OvenIcon, RefrigeratorIcon, SnowflakeIcon, WashingMachineIcon } from "@hugeicons/core-free-icons";
 import {
   IconArrowRight, IconBrandGoogle, IconCheck, IconChevronRight, IconCircleCheck,
   IconCoin, IconMapPin, IconMenu2, IconMessageCircle, IconPhone, IconSearch,
-  IconShieldCheck, IconSnowflake, IconStarFilled, IconTools, IconWashMachine,
-  IconX,
+  IconShieldCheck, IconStarFilled, IconX,
 } from "@tabler/icons-react";
 import { appliances, business, faqs, reviews, serviceAreas } from "@/content/site";
 import { ContactChooser } from "./ContactChooser";
@@ -18,14 +19,17 @@ const navItems = [
   ["about", "About Us"], ["areas", "Service Areas"], ["reviews", "Reviews"],
 ] as const;
 
-const applianceIcons = [IconSnowflake, IconSnowflake, IconWashMachine, IconTools, IconTools, IconTools];
+const applianceIcons = [RefrigeratorIcon, SnowflakeIcon, WashingMachineIcon, DishWasherIcon, OvenIcon, MicrowaveIcon];
 
 export function ApplianceWebsite() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const [selectedAppliance, setSelectedAppliance] = useState("refrigerator-freezer");
+  const [expandedAppliance, setExpandedAppliance] = useState<(typeof appliances)[number]["value"] | null>(null);
   const [showAllAreas, setShowAllAreas] = useState(false);
+
+  const expandedApplianceDetails = appliances.find((item) => item.value === expandedAppliance);
 
   const scrollTo = useCallback((id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -102,18 +106,45 @@ export function ApplianceWebsite() {
         </section>
 
         <section className="section services-section" id="appliances">
-          <div className="section-heading centered"><p className="eyebrow">What we fix</p><h2>We Repair All Major Appliances</h2><p>Select your appliance to start a callback request.</p></div>
+          <div className="section-heading centered"><p className="eyebrow">What we fix</p><h2>We Repair All Major Appliances</h2><p>Choose an appliance to see common problems and repair options.</p></div>
           <div className="service-grid">
             {appliances.map((item, index) => {
-              const ApplianceIcon = applianceIcons[index];
+              const isExpanded = expandedAppliance === item.value;
               return (
-                <button className="service-card" key={item.value} onClick={() => requestCallback(item.value)} type="button">
-                  <span className="service-icon"><ApplianceIcon /></span><h3>{item.title}</h3>
-                  <span className="service-image"><Image alt={item.alt} fill sizes="(max-width: 640px) 45vw, 190px" src={item.image} /></span>
-                  <span className="service-link">Request service <IconChevronRight /></span>
+                <button
+                  aria-controls="appliance-repair-details"
+                  aria-expanded={isExpanded}
+                  className={`service-card${isExpanded ? " is-active" : ""}`}
+                  key={item.value}
+                  onClick={() => setExpandedAppliance((current) => current === item.value ? null : item.value)}
+                  type="button"
+                >
+                  <span aria-hidden="true" className="service-icon"><HugeiconsIcon icon={applianceIcons[index]} strokeWidth={1.8} /></span>
+                  <h3>{item.title}</h3>
+                  <span className="service-link">{isExpanded ? "Hide details" : "View common repairs"}<IconChevronRight /></span>
                 </button>
               );
             })}
+          </div>
+          <div aria-hidden={!expandedApplianceDetails} className={`service-reveal${expandedApplianceDetails ? " is-open" : ""}`} id="appliance-repair-details">
+            <div className="service-reveal-inner">
+              {expandedApplianceDetails ? (
+                <article className="service-reveal-panel" key={expandedApplianceDetails.value}>
+                  <div className="service-reveal-image">
+                    <Image alt={expandedApplianceDetails.alt} fill sizes="(max-width: 760px) 100vw, 45vw" src={expandedApplianceDetails.image} />
+                  </div>
+                  <div className="service-reveal-copy">
+                    <p className="eyebrow">Typical problems we repair</p>
+                    <h3>{expandedApplianceDetails.title}</h3>
+                    <ul className="service-problem-list">
+                      {expandedApplianceDetails.problems.map((problem) => <li key={problem}><IconCircleCheck />{problem}</li>)}
+                    </ul>
+                    <p className="service-reveal-note">Tell us the brand, model, and what the appliance is doing. We’ll confirm service availability and the next step.</p>
+                    <button className="button-3d button-primary" onClick={() => requestCallback(expandedApplianceDetails.value)} type="button">Request {expandedApplianceDetails.title} repair <IconArrowRight /></button>
+                  </div>
+                </article>
+              ) : null}
+            </div>
           </div>
           <button className="text-action section-link" onClick={() => requestCallback("other")} type="button">Ask about another appliance <IconArrowRight /></button>
         </section>
