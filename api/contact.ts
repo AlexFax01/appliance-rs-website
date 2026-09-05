@@ -1,12 +1,35 @@
 import { randomUUID } from "node:crypto";
 import nodemailer from "nodemailer";
-import { contactSchema, fieldErrors, type ContactPayload } from "../src/lib/contact-schema";
+import { z } from "zod";
 
 export const config = { runtime: "nodejs" };
 
 const attempts = new Map<string, number[]>();
 const RATE_WINDOW_MS = 15 * 60 * 1000;
 const RATE_LIMIT = 6;
+
+const contactSchema = z.object({
+  name: z.string().trim().min(2).max(80),
+  phone: z.string().trim().min(10).max(30),
+  email: z.union([z.literal(""), z.string().trim().email()]),
+  applianceType: z.enum(["refrigerator-freezer", "ice-maker", "washer-dryer", "dishwasher-disposal", "oven-cooktop", "microwave", "other"]),
+  problem: z.string().trim().min(10).max(1500),
+  zipCode: z.string().trim().regex(/^\d{5}(?:-\d{4})?$/),
+  preferredContact: z.enum(["call", "text", "email"]),
+  bestTime: z.string().trim().min(2).max(80),
+  fallbackToText: z.boolean().default(false),
+  consent: z.literal(true),
+  website: z.string().max(0).optional().default(""),
+  formStartedAt: z.coerce.number().int().positive(),
+  pageUrl: z.string().url().optional().or(z.literal("")),
+  turnstileToken: z.string().optional(),
+}).superRefine((data, ctx) => {
+  if (data.preferredContact === "email" && !data.email) {
+    ctx.addIssue({ code: "custom", path: ["email"], message: "Email is required when email is your preferred contact method." });
+  }
+});
+
+type ContactPayload = z.infer<typeof contactSchema>;
 
 function json(body: unknown, status = 200) {
   return Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
@@ -79,7 +102,7 @@ async function handle(request: Request) {
   if (!Number.isFinite(startedAt) || Date.now() - startedAt < 1800) return json({ ok: false, code: "spam_check", message: "Please try again." }, 429);
 
   const parsed = contactSchema.safeParse(raw);
-  if (!parsed.success) return json({ ok: false, code: "validation", fieldErrors: fieldErrors(parsed.error) }, 400);
+  if (!parsed.success) return json({ ok: false, code: "validation", fieldErrors: parsed.error.flatten().fieldErrors }, 400);
   if (!(await verifyTurnstile(parsed.data.turnstileToken, ip))) return json({ ok: false, code: "spam_check", message: "Please complete the verification." }, 429);
 
   const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, CONTACT_FROM_EMAIL } = process.env;
