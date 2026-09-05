@@ -1,0 +1,4 @@
+# Apache protection for mail configuration/dependencies. Nginx hosts must mirror it.
+<FilesMatch "^(composer\.(json|lock)|\.user\.ini|\.env.*)$">
+  Require all denied
+</FilesMatch>

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:client-host": "DEPLOY_TARGET=client-php next build && node scripts/prepare-client-host.mjs",
+    "build:client-host": "DEPLOY_TARGET=client-php NEXT_PUBLIC_CONTACT_ENDPOINT=/api/contact.php next build && node scripts/prepare-client-host.mjs",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
@@ -23,6 +23,7 @@
     "nodemailer": "^10.0.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "sharp": "^0.35.4",
     "zod": "^4.5.4"
   },
   "devDependencies": {
@@ -38,6 +39,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.2",
     "jsdom": "^30.0.1",
+    "lighthouse": "^13.4.1",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^5.0.0"

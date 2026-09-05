@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
-import { Inter, Roboto_Condensed } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
-const robotoCondensed = Roboto_Condensed({
-  subsets: ["latin"],
+const inter = localFont({src: './fonts/inter-latin.woff2', weight:'100 900', variable: "--font-inter", display: "optional"});
+const robotoCondensed = localFont({
+  src: './fonts/roboto-condensed-latin.woff2', weight:'100 900',
   variable: "--font-heading",
-  display: "swap",
+  display: "optional",
 });
 const siteStage = process.env.NEXT_PUBLIC_SITE_STAGE ?? "preview";
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://appliance-rs-demo.vercel.app";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://appliance-rs-website.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

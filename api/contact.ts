@@ -1,6 +1,8 @@
 import { randomUUID } from "node:crypto";
 import nodemailer from "nodemailer";
-import { z } from "zod";
+import { contactSchema, type ContactPayload } from "../src/lib/contact-schema";
+import problems from "../src/content/problems.json";
+import { parseContactRequest, InputError } from "../src/lib/server/contact-input";
 
 export const config = { runtime: "nodejs" };
 
@@ -8,28 +10,9 @@ const attempts = new Map<string, number[]>();
 const RATE_WINDOW_MS = 15 * 60 * 1000;
 const RATE_LIMIT = 6;
 
-const contactSchema = z.object({
-  name: z.string().trim().min(2).max(80),
-  phone: z.string().trim().min(10).max(30),
-  email: z.union([z.literal(""), z.string().trim().email()]),
-  applianceType: z.enum(["refrigerator-freezer", "ice-maker", "washer-dryer", "dishwasher-disposal", "oven-cooktop", "microwave", "other"]),
-  problem: z.string().trim().min(10).max(1500),
-  zipCode: z.string().trim().regex(/^\d{5}(?:-\d{4})?$/),
-  preferredContact: z.enum(["call", "text", "email"]),
-  bestTime: z.string().trim().min(2).max(80),
-  fallbackToText: z.boolean().default(false),
-  consent: z.literal(true),
-  website: z.string().max(0).optional().default(""),
-  formStartedAt: z.coerce.number().int().positive(),
-  pageUrl: z.string().url().optional().or(z.literal("")),
-  turnstileToken: z.string().optional(),
-}).superRefine((data, ctx) => {
-  if (data.preferredContact === "email" && !data.email) {
-    ctx.addIssue({ code: "custom", path: ["email"], message: "Email is required when email is your preferred contact method." });
-  }
-});
-
-type ContactPayload = z.infer<typeof contactSchema>;
+function selectedProblems(payload: ContactPayload) {
+  return problems[payload.applianceType].filter(problem => payload.selectedProblemIds.includes(problem.id)).map(problem => problem.label).join("; ") || "None selected";
+}
 
 function json(body: unknown, status = 200) {
   return Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
@@ -66,6 +49,9 @@ function textBody(payload: ContactPayload, requestId: string) {
     `Phone: ${payload.phone}`,
     `Email: ${payload.email || "Not provided"}`,
     `Appliance: ${payload.applianceType}`,
+    `Brand: ${payload.brand || "Not provided"}`,
+    `Model: ${payload.model || "Not provided"}`,
+    `Selected problems: ${selectedProblems(payload)}`,
     `ZIP: ${payload.zipCode}`,
     `Preferred contact: ${payload.preferredContact}`,
     `Best time: ${payload.bestTime}`,
@@ -82,6 +68,8 @@ function htmlBody(payload: ContactPayload, requestId: string) {
   const rows = [
     ["Request", requestId], ["Name", payload.name], ["Phone", payload.phone],
     ["Email", payload.email || "Not provided"], ["Appliance", payload.applianceType],
+    ["Brand", payload.brand || "Not provided"], ["Model", payload.model || "Not provided"],
+    ["Selected problems", selectedProblems(payload)],
     ["ZIP", payload.zipCode], ["Preferred contact", payload.preferredContact],
     ["Best time", payload.bestTime], ["Text fallback", payload.fallbackToText ? "Yes" : "No"],
   ];
@@ -90,13 +78,18 @@ function htmlBody(payload: ContactPayload, requestId: string) {
 
 async function handle(request: Request) {
   if (request.method !== "POST") return json({ ok: false, code: "method_not_allowed" }, 405);
-  if (Number(request.headers.get("content-length") ?? 0) > 32_768) return json({ ok: false, code: "payload_too_large" }, 413);
 
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
   if (limited(ip)) return json({ ok: false, code: "rate_limited", message: "Please wait before trying again." }, 429);
 
-  const raw = (await request.json().catch(() => null)) as Record<string, unknown> | null;
-  if (!raw) return json({ ok: false, code: "invalid_json" }, 400);
+  let input: Awaited<ReturnType<typeof parseContactRequest>>;
+  try { input = await parseContactRequest(request); }
+  catch (error) {
+    if (error instanceof InputError) return json({ok: false, code: error.code, message: error.message}, error.status);
+    return json({ok: false, code: "invalid_request", message: "Please check your request and try again."}, 400);
+  }
+  const raw = input.raw as Record<string, unknown> | null;
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return json({ ok: false, code: "invalid_json" }, 400);
   if (typeof raw.website === "string" && raw.website.length > 0) return json({ ok: true, requestId: randomUUID() });
   const startedAt = Number(raw.formStartedAt ?? 0);
   if (!Number.isFinite(startedAt) || Date.now() - startedAt < 1800) return json({ ok: false, code: "spam_check", message: "Please try again." }, 429);
@@ -118,14 +111,16 @@ async function handle(request: Request) {
       secure: Number(SMTP_PORT ?? 587) === 465,
       auth: { user: SMTP_USER, pass: SMTP_PASS },
     });
-    await transport.sendMail({
+    const delivery = await transport.sendMail({
       from: CONTACT_FROM_EMAIL,
       to: process.env.CONTACT_TO_EMAIL ?? "appliansersl@gmail.com",
       replyTo: parsed.data.email || undefined,
       subject: `Appliance RS service request — ${parsed.data.applianceType} — ${requestId.slice(0, 8)}`,
       text: textBody(parsed.data, requestId),
       html: htmlBody(parsed.data, requestId),
+      attachments: input.attachments,
     });
+    if (!delivery.accepted?.length) throw new Error("No recipient accepted the request");
     return json({ ok: true, requestId });
   } catch {
     return json({ ok: false, code: "delivery_failed", message: "We couldn’t deliver the request right now." }, 502);

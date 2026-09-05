@@ -1,0 +1,39 @@
+{
+  "refrigerator-freezer": [
+    {"id":"fridge-not-cooling","label":"Not cooling or freezing"},
+    {"id":"fridge-leak-ice","label":"Ice buildup or leaking water"},
+    {"id":"fridge-noise","label":"Noisy compressor or fan"},
+    {"id":"fridge-door-temperature","label":"Door seal or temperature-control issues"}
+  ],
+  "ice-maker": [
+    {"id":"ice-not-making","label":"Not making ice"},
+    {"id":"ice-small-cubes","label":"Small or misshapen ice cubes"},
+    {"id":"ice-water-leak","label":"Water leaks or a frozen supply line"},
+    {"id":"ice-dispenser","label":"Dispenser or inlet-valve issues"}
+  ],
+  "washer-dryer": [
+    {"id":"washer-not-draining","label":"Washer not draining or spinning"},
+    {"id":"dryer-not-heating","label":"Dryer not heating or taking too long"},
+    {"id":"laundry-drum-belt","label":"Belt, drum, pump, or bearing problems"},
+    {"id":"laundry-leak-noise","label":"Leaks, vibration, or unusual noise"}
+  ],
+  "dishwasher-disposal": [
+    {"id":"dishwasher-dirty","label":"Dishes stay dirty or wet"},
+    {"id":"dishwasher-drain","label":"Dishwasher not draining or leaking"},
+    {"id":"dishwasher-pump","label":"Pump, spray-arm, or seal problems"},
+    {"id":"disposal-jam","label":"Disposal jam, leak, or motor failure"}
+  ],
+  "oven-cooktop": [
+    {"id":"oven-uneven-heat","label":"Oven not heating evenly"},
+    {"id":"cooktop-burner","label":"Burner or element not working"},
+    {"id":"oven-igniter","label":"Igniter, thermostat, or sensor problems"},
+    {"id":"oven-temperature","label":"Temperature-control or electrical issues"}
+  ],
+  "microwave": [
+    {"id":"microwave-not-heating","label":"Not heating"},
+    {"id":"microwave-turntable","label":"Turntable, light, or fan not working"},
+    {"id":"microwave-controls","label":"Door switch or control-panel issues"},
+    {"id":"microwave-noise","label":"Unusual noise, sparks, or shutdowns"}
+  ],
+  "other": []
+}

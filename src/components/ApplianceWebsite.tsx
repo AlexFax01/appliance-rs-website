@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useCallback, useEffect, useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { DishWasherIcon, MicrowaveIcon, OvenIcon, RefrigeratorIcon, SnowflakeIcon, WashingMachineIcon } from "@hugeicons/core-free-icons";
@@ -13,7 +14,10 @@ import {
 import { appliances, business, faqs, reviews, serviceAreas } from "@/content/site";
 import { ContactChooser } from "./ContactChooser";
 import { ContactForm } from "./ContactForm";
-import { ServiceDialog } from "./ServiceDialog";
+import { CoverageChecker } from "./CoverageChecker";
+import { HeroVisual } from "./HeroVisual";
+const ServiceDialog = dynamic(() => import('./ServiceDialog').then(module => module.ServiceDialog), {ssr: false});
+const PriceDialog = dynamic(() => import('./PriceDialog').then(module => module.PriceDialog), {ssr: false});
 
 const navItems = [
   ["home", "Home"], ["appliances", "Appliances We Repair"], ["process", "Our Process"],
@@ -29,6 +33,10 @@ export function ApplianceWebsite() {
   const [selectedAppliance, setSelectedAppliance] = useState("refrigerator-freezer");
   const [expandedAppliance, setExpandedAppliance] = useState<(typeof appliances)[number]["value"] | null>(null);
   const [showAllAreas, setShowAllAreas] = useState(false);
+  const [priceOpen, setPriceOpen] = useState(false);
+  const [zip, setZip] = useState("");
+  const [problemSelections, setProblemSelections] = useState<Record<string, string[]>>({});
+  const setProblems = (appliance: string, ids: string[]) => setProblemSelections(current => ({...current, [appliance]: ids}));
 
   const expandedApplianceDetails = appliances.find((item) => item.value === expandedAppliance);
 
@@ -100,10 +108,7 @@ export function ApplianceWebsite() {
             </div>
             <p className="location-note"><IconMapPin /> Proudly serving the Upstate of South Carolina</p>
           </div>
-          <div className="hero-visual">
-            <Image alt="Appliance RS technician explaining a refrigerator diagnosis to a homeowner" fill priority sizes="(max-width: 900px) 100vw, 50vw" src="/images/hero/appliance-rs-hero.png" />
-            <div className="hero-badge"><IconShieldCheck /><span><strong>Local service</strong><small>Clear answers. Careful work.</small></span></div>
-          </div>
+          <HeroVisual />
         </section>
 
         <section className="section services-section" id="appliances">
@@ -114,6 +119,7 @@ export function ApplianceWebsite() {
               return (
                 <button
                   aria-haspopup="dialog"
+                  data-appliance={item.value}
                   aria-expanded={isExpanded}
                   className={`service-card${isExpanded ? " is-active" : ""}`}
                   key={item.value}
@@ -133,7 +139,7 @@ export function ApplianceWebsite() {
         <section className="section why-section" id="about">
           <div className="section-heading centered"><p className="eyebrow">Why Appliance RS</p><h2>Straightforward service from a local team</h2></div>
           <div className="benefit-grid">
-            <Benefit icon={<span className="price-icon">$85</span>} title="$85 Service Call">Upfront, straightforward pricing. No surprises.</Benefit>
+            <button className="benefit-card price-card" aria-haspopup="dialog" type="button" onClick={() => setPriceOpen(true)}><span className="benefit-icon price-icon">$85</span><h3>$85 Service Call</h3><p>Upfront, straightforward pricing. No surprises.</p><span className="service-link">How pricing works <IconChevronRight /></span></button>
             <Benefit icon={<IconSearch />} title="Diagnostic Fee Waived">Service call fee waived with an approved repair.</Benefit>
             <Benefit icon={<IconShieldCheck />} title="Warranty-Backed Repairs">Parts and labor coverage is confirmed with your quote.</Benefit>
             <Benefit icon={<IconMapPin />} title="Local Upstate Service">Fast response from a team that lives and works here.</Benefit>
@@ -160,10 +166,7 @@ export function ApplianceWebsite() {
             </ul>
             <button className="text-action" onClick={() => setShowAllAreas((value) => !value)} type="button">{showAllAreas ? "Show fewer areas" : "See full service area"} <IconArrowRight /></button>
           </div>
-          <div className="map-card">
-            <iframe allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade" src={business.mapEmbed} title="Appliance RS service location on Google Maps" />
-            <a className="map-link" href={business.googleProfile} rel="noreferrer" target="_blank"><IconBrandGoogle /> Open Appliance RS on Google <IconArrowRight /></a>
-          </div>
+          <CoverageChecker onZip={setZip} />
         </section>
 
         <section className="section reviews-section" id="reviews">
@@ -181,7 +184,7 @@ export function ApplianceWebsite() {
 
         <section className="section contact-section" id="contact">
           <div className="contact-copy"><p className="eyebrow">Request service</p><h2>Tell us what’s going on. We’ll take it from here.</h2><p>Send the essentials and choose how you want us to respond. For the fastest help, call or text us directly.</p><a className="contact-phone" href={`tel:${business.phoneHref}`}><IconPhone /> {business.phoneDisplay}</a><ul><li><IconCheck /> No-obligation request</li><li><IconCheck /> Clear next steps</li><li><IconCheck /> Text fallback available</li></ul></div>
-          <ContactForm selectedAppliance={selectedAppliance} />
+          <ContactForm selectedAppliance={selectedAppliance} onApplianceChange={setSelectedAppliance} selectedProblemIds={problemSelections[selectedAppliance] ?? []} onProblemsChange={ids => setProblems(selectedAppliance, ids)} zip={zip} onZipChange={setZip} />
         </section>
 
         <section className="section faq-section" id="faq">
@@ -201,7 +204,8 @@ export function ApplianceWebsite() {
       </footer>
 
       <div className="mobile-contact-bar"><a href={`tel:${business.phoneHref}`}><IconPhone /> Call</a><a href={`sms:${business.phoneHref}`}><IconMessageCircle /> Text</a><button onClick={() => requestCallback()} type="button">Request callback</button></div>
-      <ServiceDialog onClose={() => setExpandedAppliance(null)} onRequest={requestCallback} service={expandedApplianceDetails} />
+      {expandedApplianceDetails ? <ServiceDialog key={expandedApplianceDetails.value} onClose={() => setExpandedAppliance(null)} onRequest={requestCallback} service={expandedApplianceDetails} selectedProblemIds={problemSelections[expandedApplianceDetails.value] ?? []} onProblemsChange={ids => setProblems(expandedApplianceDetails.value, ids)} /> : null}
+      {priceOpen ? <PriceDialog onClose={() => setPriceOpen(false)} onRequest={() => requestCallback()} /> : null}
       <ContactChooser onClose={() => setContactOpen(false)} onRequestCallback={() => requestCallback()} open={contactOpen} />
     </>
   );

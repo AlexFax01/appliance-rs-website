@@ -1,3 +1,10 @@
+import problemCatalog from "./problems.json";
+export { problemCatalog };
+export const pricing = {
+  fee: "$85",
+  summary: "The service call is a flat $85, and diagnostics are waived when you approve the repair.",
+  steps: ["A flat $85 service call covers the visit and diagnosis.", "Diagnostics are waived when you approve the repair.", "You receive clear pricing before work begins and pay after the work is completed."],
+};
 export const business = {
   name: "Appliance RS",
   tagline: "Local. Trusted. Reliable.",
@@ -6,7 +13,7 @@ export const business = {
   email: "appliansersl@gmail.com",
   googleProfile:
     "https://www.google.com/search?hl=en&kgmid=%2Fg%2F11z7t4g7sf&q=Appliance%20RS%20LLC",
-  mapEmbed: "https://www.google.com/maps?q=Appliance%20RS%20LLC&output=embed",
+  mapEmbed: "https://maps.google.com/maps?cid=12206806783937162522&output=embed&hl=en",
 };
 
 export const appliances = [
@@ -80,8 +87,8 @@ export const reviews = [
 ] as const;
 
 export const faqs = [
-  { question: "How much is the service call?", answer: "$85 flat service call. The diagnostic fee is waived when you approve the repair." },
+  { question: "How much is the service call?", answer: pricing.summary },
   { question: "What brands do you repair?", answer: "We service most major residential appliance brands. Tell us the brand and model in your request so we can confirm before the visit." },
-  { question: "Do you waive the diagnostic fee?", answer: "Yes. When you approve the repair, the diagnostic service-call fee is applied toward the work." },
+  { question: "Do you waive the diagnostic fee?", answer: pricing.steps[1] },
   { question: "Do you offer warranties on repairs?", answer: "Repairs are warranty-backed. The exact coverage for parts and labor is confirmed with your quote before work begins." },
 ] as const;

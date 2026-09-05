@@ -1,0 +1,27 @@
+"use client";
+import { useState } from "react";
+import { IconMapPin, IconArrowRight, IconBrandGoogle } from "@tabler/icons-react";
+import { checkCoverage, coverageSource } from "@/content/coverage";
+import { business } from "@/content/site";
+export function CoverageChecker({onZip}: {onZip: (zip: string) => void}) {
+  const [zip, setZip] = useState("");
+  const [result, setResult] = useState<ReturnType<typeof checkCoverage> | null>(null);
+  const [mapOpen, setMapOpen] = useState(false);
+  return <div className="map-card coverage-card">
+    <div className="coverage-checker">
+      <span className="coverage-pin"><IconMapPin size={34} /></span>
+      <p className="eyebrow">Local service, close to home</p><h3>Do we serve your area?</h3>
+      <p>Enter your ZIP code to check our listed service towns.</p>
+      <form onSubmit={event => {event.preventDefault(); const answer = checkCoverage(zip); setResult(answer); if (answer.status !== "invalid") onZip(answer.zip);}} noValidate>
+        <label htmlFor="coverage-zip">ZIP code</label>
+        <div className="coverage-input"><input id="coverage-zip" inputMode="numeric" autoComplete="postal-code" placeholder="29601" maxLength={10} value={zip} aria-invalid={result?.status === "invalid"} aria-describedby="coverage-result" onChange={event => {setZip(event.target.value); setResult(null);}} /><button className="button-3d button-primary" type="submit">Check my area</button></div>
+      </form>
+      <div id="coverage-result" className={`coverage-result ${result?.status ?? ""}`} role="status">
+        {result?.status === "invalid" ? "Please enter a valid 5-digit ZIP code or ZIP+4." : result?.status === "listed" ? <><strong>{result.town}, South Carolina</strong><span>Your ZIP is in our listed service area. We’ll confirm your address when scheduling.</span></> : result?.status === "unconfirmed" ? "Please contact us to confirm service in your area." : "Exact address and service availability are confirmed when scheduling."}
+      </div>
+      <small className="coverage-source">Postal data: <a href={coverageSource.url} target="_blank" rel="noreferrer">GeoNames</a> · Checked September 5, 2026</small>
+    </div>
+    {mapOpen ? <iframe allowFullScreen referrerPolicy="no-referrer-when-downgrade" src={business.mapEmbed} title="Appliance RS service location on Google Maps" /> : <button className="map-open" type="button" onClick={() => setMapOpen(true)}><IconMapPin size={19} /> Open interactive map <IconArrowRight size={17} /></button>}
+    <a className="map-link" href={business.googleProfile} rel="noreferrer" target="_blank"><IconBrandGoogle /> Open Appliance RS on Google <IconArrowRight /></a>
+  </div>;
+}
