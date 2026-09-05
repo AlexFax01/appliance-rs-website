@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto";
 import nodemailer from "nodemailer";
-import { contactSchema, type ContactPayload } from "../src/lib/contact-schema";
-import problems from "../src/content/problems.json";
-import { parseContactRequest, InputError } from "../src/lib/server/contact-input";
+import { contactSchema, type ContactPayload } from "../src/lib/contact-schema.js";
+import problems from "../src/content/problems.json" with { type: "json" };
+import { parseContactRequest, InputError } from "../src/lib/server/contact-input.js";
 
 export const config = { runtime: "nodejs" };
 

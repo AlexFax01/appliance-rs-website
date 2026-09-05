@@ -11,6 +11,9 @@
 - Screenshots are in ignored `test-results/` and `artifacts/`; reproducible browser tests are in `tests/e2e/`.
 - Production Next and static PHP builds, lint and TypeScript passed. `out/` includes both required PHP data/config files and the correct `/api/contact.php` endpoint.
 - Five cold-cache, applied mobile-throttling Lighthouse runs on the local Next production build: median LCP **804 ms**, CLS **0**, TBT **11 ms**. Separate default Lantern simulation gave **2914 ms** LCP, CLS **0**; its ≤2500 ms target was not met. Do not conflate these methods or promise every visitor a fixed load time. Field INP remains unknown without real-user data.
+- Equivalent five-run applied-throttling medians: PHP export **821 ms LCP / 0 CLS / 3 ms TBT**; deployed Vercel frontend **874 ms LCP / 0 CLS / 11 ms TBT**. Settings: 412×823 mobile viewport, 4× CPU slowdown, DevTools request latency 562.5 ms and download 1474.56 Kbps. These are lab results, not a field-performance guarantee.
+- Live browser suite: all 10 scenarios passed. Follow-up also verifies image decoding for every appliance, not merely a visible image element.
+- Live API verification caught an ESM entrypoint error: Vercel emits independent JavaScript modules, unlike Vitest's resolver. Fixed explicit `.js` imports and JSON import attributes. Added `scripts/test-vercel-output.mjs`, which loads the emitted function and proves method handling and validated attachments before testing the live endpoint.
 - Release/inbox gate: Vercel production has no SMTP environment variables configured. A real received email with photographs is still required after mail setup on either final host. Successful mocked tests do not establish inbox delivery.
 
 The sections below record the earlier baseline and are retained as history.

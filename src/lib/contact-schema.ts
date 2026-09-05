@@ -1,5 +1,5 @@
 import { z } from "zod";
-import problems from "../content/problems.json";
+import problems from "../content/problems.json" with { type: "json" };
 
 export const applianceValues = [
   "refrigerator-freezer", "ice-maker", "washer-dryer", "dishwasher-disposal",

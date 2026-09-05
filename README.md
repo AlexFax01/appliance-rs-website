@@ -86,4 +86,6 @@ Run a production server on port 3100, then `npm run test:e2e` (isolated Chrome).
 
 `PHP_TEST_RUNTIME=/path/to/frankenphp node scripts/test-php.mjs` runs isolated PHP transport/validation checks with a test-only mail class, never included in `out/`. `npm run test:php` remains available on hosts with a normal PHP CLI.
 
+After `vercel build --prod`, run `node scripts/test-vercel-output.mjs` to check the real emitted function, including ESM imports and validated image decoding. It disables SMTP in its own process and never sends external mail.
+
 `node scripts/measure-performance.mjs URL LABEL` writes five cold-cache mobile Lighthouse runs into ignored `artifacts/performance/`. It uses applied DevTools network/CPU throttling rather than simulated Lantern estimates. Record which method was used; lab TBT is not field INP.

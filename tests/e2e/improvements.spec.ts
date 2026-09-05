@@ -11,6 +11,7 @@ test('six appliance modals, keyboard focus, review tabs and no overflow',async({
   const card=page.locator(`[data-appliance="${value}"]`);await card.click();
   const dialog=page.getByRole('dialog');await expect(dialog).toBeVisible();
   await expect(dialog.locator('img')).toBeVisible();
+  await expect.poll(()=>dialog.locator('img').evaluate((img: HTMLImageElement)=>img.complete && img.naturalWidth>0)).toBe(true);
   await page.screenshot({path:`test-results/${info.project.name}-${value}-problems.png`,animations:'disabled'});
   await expect(dialog.locator('.problem-option')).toHaveCount(4);
   await dialog.getByRole('tab',{name:'Common problems'}).focus();await page.keyboard.press('ArrowRight');
