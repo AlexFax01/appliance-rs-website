@@ -7,6 +7,8 @@ Standalone redesign demo for Appliance RS. The project is intentionally separate
 
 No database, Supabase, CRM, or automation service is required.
 
+Current noindex client demo: <https://appliance-rs-website.vercel.app>
+
 ## Local development
 
 ```bash

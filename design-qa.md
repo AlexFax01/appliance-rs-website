@@ -32,6 +32,8 @@
 - Vitest: 3/3 passed.
 - Next.js production build: passed.
 - Static client-host build: passed and includes `api/contact.php`.
+- Vercel page returned HTTP 200 with `X-Robots-Tag: noindex, nofollow, noarchive`.
+- Vercel contact endpoint returned 405 for GET and the expected 502 `delivery_not_configured` response for a valid controlled POST before SMTP credentials are supplied.
 - PHP CLI was not installed on this workstation, so the PHP syntax check remains a host/deployment gate.
 
 final result: passed
