@@ -33,9 +33,9 @@ test('problem selections and ZIP transfer without erasing notes',async({page})=>
  await expect(page.locator('.selected-problems [aria-pressed=true]')).toHaveCount(2);
  await page.locator('[name=applianceType]').selectOption('microwave');await expect(page.locator('[name=problem]')).toHaveValue('Please keep these independent notes.');
  await expect(page.locator('.selected-problems [aria-pressed=true]')).toHaveCount(0);
- await page.locator('.coverage-input input').fill('29601');await page.getByRole('button',{name:'Check my area'}).click();
+ await page.locator('.coverage-input input').fill('29601');
  await expect(page.locator('.coverage-result')).toContainText('Your ZIP is in our listed service area.');await expect(page.locator('[name=zipCode]')).toHaveValue('29601');
- await page.locator('.coverage-input input').fill('99999');await page.getByRole('button',{name:'Check my area'}).click();await expect(page.locator('.coverage-result')).toContainText('Please contact us');await expect(page.locator('[name=zipCode]')).toHaveValue('99999');
+ await page.locator('.coverage-input input').fill('99999');await expect(page.locator('.coverage-result')).toContainText('Please contact us');await expect(page.locator('[name=zipCode]')).toHaveValue('99999');
  await expect(page.locator('iframe')).toHaveAttribute('src',/12206806783937162522/);await expect(page.locator('iframe')).toHaveAttribute('loading','lazy');
 });
 test('photo preparation, limit and prepared SMS retention',async({page})=>{
@@ -70,4 +70,11 @@ test('mobile menu, persistent contact and map are usable',async({page})=>{
  await page.getByRole('navigation',{name:'Mobile navigation'}).getByRole('link',{name:'Service Areas'}).click();await expect(page).toHaveURL(/#areas$/);await expect(page.getByRole('navigation',{name:'Mobile navigation'})).toHaveCount(0);await expect(page.locator('iframe')).toBeVisible();
  await expect(page.locator('.mobile-contact-bar .mobile-call')).toHaveAttribute('href','tel:+18649244349');
  await page.locator('[data-appliance="refrigerator-freezer"]').click();const dialog=page.getByRole('dialog');await expect(dialog.getByRole('button',{name:'Request repair'})).toBeVisible();await expect(dialog.getByRole('link',{name:'Call now'})).toBeVisible();
+});
+
+test('service areas are ranked and visually tiered',async({page})=>{
+ await page.goto('/');const areas=page.locator('.area-list li');await expect(areas).toHaveCount(10);
+ await expect(areas.nth(0)).toContainText('Greenville');await expect(areas.nth(1)).toContainText('Spartanburg');await expect(areas.nth(2)).toContainText('Greer');
+ await expect(areas.nth(0)).toHaveClass(/area-large/);await expect(areas.nth(4)).toHaveClass(/area-large/);await expect(areas.nth(5)).toHaveClass(/area-medium/);await expect(areas.nth(8)).toHaveClass(/area-small/);
+ const sizes=await Promise.all([0,5,8].map(index=>areas.nth(index).evaluate(node=>Number.parseFloat(getComputedStyle(node).fontSize))));expect(sizes[0]).toBeGreaterThan(sizes[1]);expect(sizes[1]).toBeGreaterThan(sizes[2]);
 });

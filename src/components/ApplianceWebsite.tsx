@@ -168,7 +168,10 @@ export function ApplianceWebsite() {
             <p className="eyebrow">Local coverage</p><h2>Proudly Serving the Upstate of South Carolina</h2>
             <p>Professional appliance repair throughout Greenville, Spartanburg, and nearby communities.</p>
             <ul className="area-list">
-              {serviceAreas.slice(0, showAllAreas ? serviceAreas.length : 10).map((area) => <li className={area.primary ? "area-primary" : undefined} key={area.name}><IconCheck /> <span>{area.name}</span></li>)}
+              {serviceAreas.slice(0, showAllAreas ? serviceAreas.length : 10).map((area) => {
+                const tier = area.population !== null && area.population >= 20_000 ? "large" : area.population !== null && area.population >= 5_000 ? "medium" : "small";
+                return <li className={`area-${tier}${area.primary ? " area-primary" : ""}`} key={area.name}><IconCheck /> <span>{area.name}</span></li>;
+              })}
             </ul>
             <button className="text-action" onClick={() => setShowAllAreas((value) => !value)} type="button">{showAllAreas ? "Show fewer areas" : "See full service area"} <IconArrowRight /></button>
           </div>

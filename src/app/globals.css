@@ -136,8 +136,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .area-copy { padding: 20px 0; }
 .area-copy > p:not(.eyebrow) { color: var(--muted); }
 .area-list { display: grid; gap: 10px 24px; grid-template-columns: repeat(2, 1fr); list-style: none; margin: 26px 0 18px; padding: 0; }
-.area-list li { align-items: center; display: flex; font-size: .92rem; gap: 8px; }
-.area-list li.area-primary span { color: var(--deep); font-weight: 850; }
+.area-list li { align-items: center; display: flex; gap: 8px; }
+.area-list li.area-large { color: var(--deep); font-size: 1rem; font-weight: 850; }
+.area-list li.area-medium { color: #34445a; font-size: .9rem; font-weight: 700; }
+.area-list li.area-small { color: var(--muted); font-size: .81rem; font-weight: 600; }
+.area-list li.area-primary span { color: var(--deep); }
 .area-list svg { color: var(--orange); height: 17px; min-width: 17px; stroke-width: 3; width: 17px; }
 .map-card { background: #fff; border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow-card); display: flex; flex-direction: column; min-height: 520px; overflow: hidden; }
 .map-card iframe { border: 0; flex: 1; min-height: 450px; width: 100%; }
