@@ -93,7 +93,7 @@ export function ApplianceWebsite() {
         </div>
         {mobileOpen ? (
           <nav aria-label="Mobile navigation" className="mobile-nav" id="mobile-navigation">
-            {navItems.map(([id, label]) => <a href={`#${id}`} key={id} onClick={(event) => followSectionLink(event, id)}>{label}</a>)}
+            {navItems.map(([id, label]) => <a aria-current={activeSection === id ? "page" : undefined} href={`#${id}`} key={id} onClick={() => setMobileOpen(false)}>{label}</a>)}
             <button className="button-3d button-orange" onClick={() => { setMobileOpen(false); setContactOpen(true); }} type="button">Call or Text {business.phoneDisplay}</button>
           </nav>
         ) : null}

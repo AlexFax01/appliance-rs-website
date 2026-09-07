@@ -68,7 +68,8 @@ test('selected-only request and readable model photo',async({page},info)=>{
 test('mobile menu, persistent contact and lazy map are usable',async({page})=>{
  await page.setViewportSize({width:390,height:844});await page.goto('/');
  const menu=page.getByRole('button',{name:'Toggle navigation'});await menu.click();await expect(page.getByRole('navigation',{name:'Mobile navigation'})).toBeVisible();
- await page.getByRole('navigation',{name:'Mobile navigation'}).getByRole('link',{name:'Service Areas'}).click();await expect(page).toHaveURL(/#areas$/);await expect(page.getByRole('navigation',{name:'Mobile navigation'})).toHaveCount(0);
+ await page.getByRole('navigation',{name:'Mobile navigation'}).getByRole('link',{name:'Appliances We Repair'}).click();await expect(page).toHaveURL(/#appliances$/);await expect(page.getByRole('navigation',{name:'Mobile navigation'})).toHaveCount(0);await expect(page.locator('#appliances')).toBeInViewport();
+ await menu.click();await page.getByRole('navigation',{name:'Mobile navigation'}).getByRole('link',{name:'Service Areas'}).click();await expect(page).toHaveURL(/#areas$/);await expect(page.getByRole('navigation',{name:'Mobile navigation'})).toHaveCount(0);await expect(page.locator('#areas')).toBeInViewport();
  await expect(page.locator('iframe')).toHaveCount(0);await expect(page.locator('.service-map-preview')).toBeVisible();await expect(page.locator('.map-city')).toHaveCount(5);
  await page.getByRole('button',{name:'Explore interactive map'}).click();await expect(page.locator('iframe')).toBeVisible();await page.getByRole('button',{name:'Back to service area'}).click();await expect(page.locator('iframe')).toHaveCount(0);
  await expect(page.locator('.mobile-contact-bar .mobile-call')).toHaveAttribute('href','tel:+18649244349');
