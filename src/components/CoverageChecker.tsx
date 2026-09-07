@@ -3,9 +3,22 @@ import { useState } from "react";
 import { IconMapPin, IconArrowRight, IconBrandGoogle } from "@tabler/icons-react";
 import { checkCoverage, coverageSource } from "@/content/coverage";
 import { business } from "@/content/site";
+
+const mapCities = [
+  { name: "Travelers Rest", position: "travelers-rest" },
+  { name: "Greenville", position: "greenville" },
+  { name: "Greer", position: "greer" },
+  { name: "Simpsonville", position: "simpsonville" },
+  { name: "Spartanburg", position: "spartanburg" },
+] as const;
+
+const cityMapUrl = (name: string) =>
+  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${name}, SC`)}`;
+
 export function CoverageChecker({onZip}: {onZip: (zip: string) => void}) {
   const [zip, setZip] = useState("");
   const [result, setResult] = useState<ReturnType<typeof checkCoverage> | null>(null);
+  const [mapOpen, setMapOpen] = useState(false);
   const evaluate = (value: string, showInvalid = true) => {
     const answer = checkCoverage(value);
     if (answer.status === "invalid" && !showInvalid) {
@@ -29,8 +42,23 @@ export function CoverageChecker({onZip}: {onZip: (zip: string) => void}) {
       </div>
       <small className="coverage-source">Postal data: <a href={coverageSource.url} target="_blank" rel="noreferrer">GeoNames</a> · Checked September 5, 2026</small>
     </div>
-    <div className="map-heading"><IconMapPin size={19} /><strong>Our Upstate service area</strong></div>
-    <iframe allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade" src={business.mapEmbed} title="Appliance RS service location on Google Maps" />
+    {mapOpen ? <div className="interactive-map">
+      <iframe allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade" src={business.mapEmbed} title="Appliance RS service location on Google Maps" />
+      <button className="map-close" type="button" onClick={() => setMapOpen(false)}>Back to service area</button>
+    </div> : <div className="service-map-preview">
+      <div className="service-map-visual">
+        <picture>
+          <source srcSet="/images/map/upstate-service-area-3d.avif" type="image/avif" />
+          <img src="/images/map/upstate-service-area-3d.webp" alt="" width="960" height="640" loading="lazy" decoding="async" />
+        </picture>
+        {mapCities.map(city => <a className={`map-city map-city-${city.position}`} href={cityMapUrl(city.name)} key={city.name} rel="noreferrer" target="_blank" aria-label={`Open ${city.name}, South Carolina in Google Maps`}><span>{city.name}</span></a>)}
+      </div>
+      <div className="map-preview-copy">
+        <span className="map-preview-icon"><IconMapPin size={24} /></span>
+        <div><p className="eyebrow">Our Upstate service area</p><h3>See where Appliance RS works</h3><p>Explore our main service towns without loading a live map.</p></div>
+        <button className="button-3d button-primary" type="button" onClick={() => setMapOpen(true)}>Explore interactive map <IconArrowRight size={18} /></button>
+      </div>
+    </div>}
     <a className="map-link" href={business.googleProfile} rel="noreferrer" target="_blank"><IconBrandGoogle /> Open Appliance RS on Google <IconArrowRight /></a>
   </div>;
 }

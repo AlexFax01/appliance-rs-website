@@ -6,7 +6,7 @@ import {mkdir,writeFile} from 'node:fs/promises';
 const categories=['refrigerator-freezer','ice-maker','washer-dryer','dishwasher-disposal','oven-cooktop','microwave'];
 test('six appliance modals, keyboard focus, review tabs and no overflow',async({page},info)=>{
  await page.goto('/');
- await expect(page.locator('iframe')).toHaveCount(1);await expect(page.locator('iframe')).toHaveAttribute('loading','lazy');
+ await expect(page.locator('iframe')).toHaveCount(0);await expect(page.locator('.service-map-preview')).toBeVisible();
  for(const value of categories){
   const card=page.locator(`[data-appliance="${value}"]`);await card.click();
   const dialog=page.getByRole('dialog');await expect(dialog).toBeVisible();
@@ -36,6 +36,7 @@ test('problem selections and ZIP transfer without erasing notes',async({page})=>
  await page.locator('.coverage-input input').fill('29601');
  await expect(page.locator('.coverage-result')).toContainText('Your ZIP is in our listed service area.');await expect(page.locator('[name=zipCode]')).toHaveValue('29601');
  await page.locator('.coverage-input input').fill('99999');await expect(page.locator('.coverage-result')).toContainText('Please contact us');await expect(page.locator('[name=zipCode]')).toHaveValue('99999');
+ await expect(page.locator('iframe')).toHaveCount(0);await page.getByRole('button',{name:'Explore interactive map'}).click();
  await expect(page.locator('iframe')).toHaveAttribute('src',/12206806783937162522/);await expect(page.locator('iframe')).toHaveAttribute('loading','lazy');
 });
 test('photo preparation, limit and prepared SMS retention',async({page})=>{
@@ -64,10 +65,12 @@ test('selected-only request and readable model photo',async({page},info)=>{
  await page.getByRole('button',{name:'Review & open SMS'}).click();await expect(page.locator('.form-notice')).toContainText('ready');await expect(page.locator('.photo-preview')).toHaveCount(1);const sms=decodeURIComponent((await page.locator('#sms-ready-link').getAttribute('href'))!);expect(sms).toContain('Common problems: Dryer not heating');
 });
 
-test('mobile menu, persistent contact and map are usable',async({page})=>{
+test('mobile menu, persistent contact and lazy map are usable',async({page})=>{
  await page.setViewportSize({width:390,height:844});await page.goto('/');
  const menu=page.getByRole('button',{name:'Toggle navigation'});await menu.click();await expect(page.getByRole('navigation',{name:'Mobile navigation'})).toBeVisible();
- await page.getByRole('navigation',{name:'Mobile navigation'}).getByRole('link',{name:'Service Areas'}).click();await expect(page).toHaveURL(/#areas$/);await expect(page.getByRole('navigation',{name:'Mobile navigation'})).toHaveCount(0);await expect(page.locator('iframe')).toBeVisible();
+ await page.getByRole('navigation',{name:'Mobile navigation'}).getByRole('link',{name:'Service Areas'}).click();await expect(page).toHaveURL(/#areas$/);await expect(page.getByRole('navigation',{name:'Mobile navigation'})).toHaveCount(0);
+ await expect(page.locator('iframe')).toHaveCount(0);await expect(page.locator('.service-map-preview')).toBeVisible();await expect(page.locator('.map-city')).toHaveCount(5);
+ await page.getByRole('button',{name:'Explore interactive map'}).click();await expect(page.locator('iframe')).toBeVisible();await page.getByRole('button',{name:'Back to service area'}).click();await expect(page.locator('iframe')).toHaveCount(0);
  await expect(page.locator('.mobile-contact-bar .mobile-call')).toHaveAttribute('href','tel:+18649244349');
  await page.locator('[data-appliance="refrigerator-freezer"]').click();const dialog=page.getByRole('dialog');await expect(dialog.getByRole('button',{name:'Request repair'})).toBeVisible();await expect(dialog.getByRole('link',{name:'Call now'})).toBeVisible();
 });

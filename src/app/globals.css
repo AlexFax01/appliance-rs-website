@@ -144,7 +144,27 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .area-list svg { color: var(--orange); height: 17px; min-width: 17px; stroke-width: 3; width: 17px; }
 .map-card { background: #fff; border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow-card); display: flex; flex-direction: column; min-height: 520px; overflow: hidden; }
 .map-card iframe { border: 0; flex: 1; min-height: 450px; width: 100%; }
-.map-heading { align-items: center; background: #eaf3ff; border-bottom: 1px solid var(--line); color: var(--navy); display: flex; font-size: .86rem; gap: 9px; justify-content: center; padding: 15px; }
+.service-map-preview { background: linear-gradient(160deg, #eef6ff, #fff 75%); display: flex; flex: 1; flex-direction: column; }
+.service-map-visual { aspect-ratio: 3 / 2; min-height: 300px; overflow: hidden; position: relative; }
+.service-map-visual picture, .service-map-visual picture img { height: 100%; inset: 0; position: absolute; width: 100%; }
+.service-map-visual picture img { object-fit: contain; padding: 6px 14px 0; }
+.map-city { align-items: center; color: var(--deep); display: flex; font-size: .68rem; font-weight: 850; justify-content: center; left: var(--city-x); min-height: 44px; min-width: 44px; padding-top: 19px; position: absolute; text-decoration: none; top: var(--city-y); transform: translate(-50%, -50%); transition: transform 180ms ease; z-index: 2; }
+.map-city::before { background: var(--orange); border: 3px solid #fff; border-radius: 50% 50% 50% 0; box-shadow: 0 4px 10px rgba(3,27,67,.28); content: ""; height: 17px; left: 50%; position: absolute; top: 3px; transform: translateX(-50%) rotate(-45deg); width: 17px; }
+.map-city span { background: rgba(255,255,255,.93); border: 1px solid rgba(185,203,226,.85); border-radius: 999px; box-shadow: 0 3px 9px rgba(6,43,99,.12); padding: 3px 7px; white-space: nowrap; }
+.map-city:hover, .map-city:focus-visible { transform: translate(-50%, calc(-50% - 4px)); }
+.map-city-travelers-rest { --city-x: 27%; --city-y: 34%; }
+.map-city-greenville { --city-x: 43%; --city-y: 51%; }
+.map-city-greer { --city-x: 56%; --city-y: 36%; }
+.map-city-simpsonville { --city-x: 50%; --city-y: 70%; }
+.map-city-spartanburg { --city-x: 77%; --city-y: 48%; }
+.map-preview-copy { align-items: center; background: #fff; border-top: 1px solid var(--line); display: grid; gap: 14px; grid-template-columns: auto 1fr auto; padding: 19px 22px 21px; position: relative; z-index: 3; }
+.map-preview-copy .eyebrow { font-size: .64rem; margin-bottom: 4px; }
+.map-preview-copy h3 { font-size: 1.13rem; margin-bottom: 3px; }
+.map-preview-copy p:last-child { color: var(--muted); font-size: .74rem; line-height: 1.4; margin-bottom: 0; }
+.map-preview-icon { align-items: center; background: #eaf3ff; border-radius: 50%; color: var(--blue); display: flex; height: 42px; justify-content: center; width: 42px; }
+.map-preview-copy .button-3d { font-size: .75rem; padding: 11px 14px; }
+.interactive-map { display: flex; flex: 1; flex-direction: column; min-height: 500px; }
+.map-close { background: #eaf3ff; border: 0; border-top: 1px solid var(--line); color: var(--navy); cursor: pointer; font-size: .8rem; font-weight: 850; min-height: 46px; padding: 10px; }
 .map-link { align-items: center; color: var(--navy); display: flex; font-size: .88rem; font-weight: 850; gap: 9px; justify-content: center; padding: 17px; text-decoration: none; }
 .map-link svg:last-child { height: 17px; width: 17px; }
 .reviews-section { padding-top: 60px; }
@@ -379,11 +399,17 @@ dialog::backdrop { background: rgba(1,12,30,.76); backdrop-filter: blur(3px); }
   .why-section { border-radius: 0; margin-bottom: 0; padding-left: 18px; padding-right: 18px; }
   .benefit-grid, .process-list { grid-template-columns: 1fr; } .process-list li { padding: 0 20px; }
   .area-section { gap: 32px; } .area-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .map-card { min-height: 410px; } .map-card iframe { display: block; min-height: 300px; }
-  .coverage-card .map-heading { order: 1; }
-  .coverage-card iframe { order: 2; }
+  .map-card { min-height: 410px; } .map-card iframe { display: block; min-height: 330px; }
+  .coverage-card .service-map-preview, .coverage-card .interactive-map { order: 1; }
   .coverage-card .map-link { order: 3; }
   .coverage-card .coverage-checker { order: 4; }
+  .service-map-visual { min-height: 260px; }
+  .service-map-visual picture img { padding: 4px 3px 0; }
+  .map-city { font-size: .6rem; }
+  .map-city span { padding: 3px 6px; }
+  .map-preview-copy { align-items: stretch; grid-template-columns: auto 1fr; padding: 18px 16px 20px; }
+  .map-preview-copy .button-3d { grid-column: 1 / -1; min-height: 49px; width: 100%; }
+  .interactive-map { min-height: 425px; }
   .reviews-top { display: grid; }
   .contact-section { border-radius: 0; box-shadow: none; gap: 32px; margin-bottom: 45px; padding: 55px 18px; }
   .callback-form { padding: 22px 17px; } .form-grid, .faq-grid { grid-template-columns: 1fr; } .form-span { grid-column: auto; }
