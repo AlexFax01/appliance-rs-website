@@ -45,6 +45,12 @@ export function ApplianceWebsite() {
     setMobileOpen(false);
   }, []);
 
+  const followSectionLink = useCallback((event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    event.preventDefault();
+    window.history.replaceState(null, "", `#${id}`);
+    scrollTo(id);
+  }, [scrollTo]);
+
   const requestCallback = useCallback((appliance?: string) => {
     if (appliance) setSelectedAppliance(appliance);
     window.setTimeout(() => scrollTo("contact"), 20);
@@ -69,26 +75,26 @@ export function ApplianceWebsite() {
     <>
       <header className="site-header">
         <div className="header-inner">
-          <button aria-label="Go to top" className="brand" onClick={() => scrollTo("home")} type="button">
+          <a aria-label="Go to top" className="brand" href="#home" onClick={(event) => followSectionLink(event, "home")}>
             <Image alt="Appliance RS round logo" className="brand-logo" height={54} priority src="/images/brand/appliance-rs-logo.webp" width={54} />
             <span className="brand-copy"><strong>Appliance RS</strong><small>{business.tagline}</small></span>
-          </button>
+          </a>
           <nav aria-label="Primary navigation" className="desktop-nav">
             {navItems.map(([id, label]) => (
-              <button className={activeSection === id ? "active" : ""} key={id} onClick={() => scrollTo(id)} type="button">{label}</button>
+              <a className={activeSection === id ? "active" : ""} href={`#${id}`} key={id} onClick={(event) => followSectionLink(event, id)}>{label}</a>
             ))}
           </nav>
-          <button className="button-3d button-primary header-cta" onClick={() => setContactOpen(true)} type="button">
+          <button className="button-3d button-orange header-cta" onClick={() => setContactOpen(true)} type="button">
             <IconPhone className="phone-wiggle" size={19} /><span>Call or Text</span><strong>{business.phoneDisplay}</strong>
           </button>
-          <button aria-expanded={mobileOpen} aria-label="Toggle navigation" className="icon-button menu-button" onClick={() => setMobileOpen((value) => !value)} type="button">
+          <button aria-controls="mobile-navigation" aria-expanded={mobileOpen} aria-label="Toggle navigation" className="icon-button menu-button" onClick={() => setMobileOpen((value) => !value)} type="button">
             {mobileOpen ? <IconX /> : <IconMenu2 />}
           </button>
         </div>
         {mobileOpen ? (
-          <nav aria-label="Mobile navigation" className="mobile-nav">
-            {navItems.map(([id, label]) => <button key={id} onClick={() => scrollTo(id)} type="button">{label}</button>)}
-            <button className="button-3d button-primary" onClick={() => { setMobileOpen(false); setContactOpen(true); }} type="button">Call or Text {business.phoneDisplay}</button>
+          <nav aria-label="Mobile navigation" className="mobile-nav" id="mobile-navigation">
+            {navItems.map(([id, label]) => <a href={`#${id}`} key={id} onClick={(event) => followSectionLink(event, id)}>{label}</a>)}
+            <button className="button-3d button-orange" onClick={() => { setMobileOpen(false); setContactOpen(true); }} type="button">Call or Text {business.phoneDisplay}</button>
           </nav>
         ) : null}
       </header>
@@ -103,7 +109,7 @@ export function ApplianceWebsite() {
               <span><IconShieldCheck /> Fully Insured</span><span><IconCoin /> Clear Pricing</span><span><IconCircleCheck /> Pay After Repair</span>
             </div>
             <div className="hero-actions">
-              <button className="button-3d button-primary button-large" onClick={() => setContactOpen(true)} type="button"><IconPhone className="phone-wiggle" /> Call or Text {business.phoneDisplay}</button>
+              <button className="button-3d button-orange button-large" onClick={() => setContactOpen(true)} type="button"><IconPhone className="phone-wiggle" /> Call or Text {business.phoneDisplay}</button>
               <button className="text-action" onClick={() => requestCallback()} type="button">Request a callback <IconArrowRight /></button>
             </div>
             <p className="location-note"><IconMapPin /> Proudly serving the Upstate of South Carolina</p>
@@ -162,7 +168,7 @@ export function ApplianceWebsite() {
             <p className="eyebrow">Local coverage</p><h2>Proudly Serving the Upstate of South Carolina</h2>
             <p>Professional appliance repair throughout Greenville, Spartanburg, and nearby communities.</p>
             <ul className="area-list">
-              {serviceAreas.slice(0, showAllAreas ? serviceAreas.length : 10).map((area) => <li key={area}><IconCheck /> {area}</li>)}
+              {serviceAreas.slice(0, showAllAreas ? serviceAreas.length : 10).map((area) => <li className={area.primary ? "area-primary" : undefined} key={area.name}><IconCheck /> <span>{area.name}</span></li>)}
             </ul>
             <button className="text-action" onClick={() => setShowAllAreas((value) => !value)} type="button">{showAllAreas ? "Show fewer areas" : "See full service area"} <IconArrowRight /></button>
           </div>
@@ -174,7 +180,7 @@ export function ApplianceWebsite() {
           <div className="review-grid">
             {reviews.map((review) => (
               <article className="review-card" key={review.name}>
-                <div className="stars" aria-label="5 out of 5 stars">{Array.from({ length: 5 }, (_, i) => <IconStarFilled key={i} />)}</div>
+                <div className="stars" aria-label="5 out of 5 stars" role="img">{Array.from({ length: 5 }, (_, i) => <IconStarFilled key={i} />)}</div>
                 <blockquote>“{review.text}”</blockquote><footer><strong>{review.name}</strong><span>{review.date} · Google review</span></footer>
               </article>
             ))}
@@ -183,7 +189,7 @@ export function ApplianceWebsite() {
         </section>
 
         <section className="section contact-section" id="contact">
-          <div className="contact-copy"><p className="eyebrow">Request service</p><h2>Tell us what’s going on. We’ll take it from here.</h2><p>Send the essentials and choose how you want us to respond. For the fastest help, call or text us directly.</p><a className="contact-phone" href={`tel:${business.phoneHref}`}><IconPhone /> {business.phoneDisplay}</a><ul><li><IconCheck /> No-obligation request</li><li><IconCheck /> Clear next steps</li><li><IconCheck /> Text fallback available</li></ul></div>
+          <div className="contact-copy"><p className="eyebrow">Request service by text</p><h2>Tell us what’s going on. We’ll build the message.</h2><p>Complete the form and we’ll open a ready-to-send SMS to Appliance RS. Review it, add any photos you want to share, and press Send.</p><a className="contact-phone" href={`tel:${business.phoneHref}`}><IconPhone /> {business.phoneDisplay}</a><ul><li><IconCheck /> No-obligation request</li><li><IconCheck /> Your details stay in the message</li><li><IconCheck /> You choose when to send</li></ul></div>
           <ContactForm selectedAppliance={selectedAppliance} onApplianceChange={setSelectedAppliance} selectedProblemIds={problemSelections[selectedAppliance] ?? []} onProblemsChange={ids => setProblems(selectedAppliance, ids)} zip={zip} onZipChange={setZip} />
         </section>
 
@@ -203,7 +209,7 @@ export function ApplianceWebsite() {
         <p>© 2026 Appliance RS. All rights reserved.</p><div className="footer-links"><Link href="/privacy">Privacy</Link><span>Fully Insured</span><span>Pay After Repair</span><span>Clear Pricing</span></div>
       </footer>
 
-      <div className="mobile-contact-bar"><a href={`tel:${business.phoneHref}`}><IconPhone /> Call</a><a href={`sms:${business.phoneHref}`}><IconMessageCircle /> Text</a><button onClick={() => requestCallback()} type="button">Request callback</button></div>
+      <nav aria-label="Quick contact" className="mobile-contact-bar"><a className="mobile-call" href={`tel:${business.phoneHref}`}><IconPhone /> Call</a><a href={`sms:${business.phoneHref}`}><IconMessageCircle /> Text</a><button onClick={() => requestCallback()} type="button">Start SMS request</button></nav>
       {expandedApplianceDetails ? <ServiceDialog key={expandedApplianceDetails.value} onClose={() => setExpandedAppliance(null)} onRequest={requestCallback} service={expandedApplianceDetails} selectedProblemIds={problemSelections[expandedApplianceDetails.value] ?? []} onProblemsChange={ids => setProblems(expandedApplianceDetails.value, ids)} /> : null}
       {priceOpen ? <PriceDialog onClose={() => setPriceOpen(false)} onRequest={() => requestCallback()} /> : null}
       <ContactChooser onClose={() => setContactOpen(false)} onRequestCallback={() => requestCallback()} open={contactOpen} />

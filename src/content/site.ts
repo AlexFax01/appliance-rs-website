@@ -61,11 +61,29 @@ export const appliances = [
   },
 ] as const;
 
+// 2020 Census place populations, largest first. Moore is an unincorporated
+// community without a directly comparable Census-place count, so it follows
+// the ranked places. The four regional centers receive stronger visual weight.
 export const serviceAreas = [
-  "Moore", "Greer", "Lyman", "Roebuck", "Duncan", "Arcadia", "Drayton",
-  "Taylors", "Greenville", "Inman", "Reidville", "Wellford", "Chesnee",
-  "Campobello", "Landrum", "Simpsonville", "Spartanburg", "Travelers Rest",
-  "Boiling Springs",
+  { name: "Greenville", population: 70_720, primary: true },
+  { name: "Spartanburg", population: 38_732, primary: true },
+  { name: "Greer", population: 35_308, primary: true },
+  { name: "Simpsonville", population: 23_354, primary: true },
+  { name: "Taylors", population: 23_222, primary: false },
+  { name: "Boiling Springs", population: 10_405, primary: false },
+  { name: "Travelers Rest", population: 7_788, primary: false },
+  { name: "Lyman", population: 6_173, primary: false },
+  { name: "Duncan", population: 4_041, primary: false },
+  { name: "Wellford", population: 3_293, primary: false },
+  { name: "Arcadia", population: 3_246, primary: false },
+  { name: "Inman", population: 2_990, primary: false },
+  { name: "Landrum", population: 2_481, primary: false },
+  { name: "Roebuck", population: 2_357, primary: false },
+  { name: "Reidville", population: 1_634, primary: false },
+  { name: "Drayton", population: 1_115, primary: false },
+  { name: "Chesnee", population: 829, primary: false },
+  { name: "Campobello", population: 675, primary: false },
+  { name: "Moore", population: null, primary: false },
 ] as const;
 
 export const reviews = [

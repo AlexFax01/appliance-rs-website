@@ -49,7 +49,7 @@ export function ContactChooser({ open, onClose, onRequestCallback }: ContactChoo
         <h2 id="contact-dialog-title">Choose the easiest way to reach us.</h2>
         <p className="dialog-copy">Call or text now, or send a short callback request and we’ll follow up.</p>
         <div className="dialog-actions">
-          <a className="button-3d button-primary" href={`tel:${business.phoneHref}`}>
+          <a className="button-3d button-orange" href={`tel:${business.phoneHref}`}>
             <IconPhone size={22} /> Call now
           </a>
           <a className="button-3d button-secondary" href={`sms:${business.phoneHref}`}>

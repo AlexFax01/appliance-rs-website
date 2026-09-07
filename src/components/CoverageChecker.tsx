@@ -6,7 +6,6 @@ import { business } from "@/content/site";
 export function CoverageChecker({onZip}: {onZip: (zip: string) => void}) {
   const [zip, setZip] = useState("");
   const [result, setResult] = useState<ReturnType<typeof checkCoverage> | null>(null);
-  const [mapOpen, setMapOpen] = useState(false);
   return <div className="map-card coverage-card">
     <div className="coverage-checker">
       <span className="coverage-pin"><IconMapPin size={34} /></span>
@@ -21,7 +20,8 @@ export function CoverageChecker({onZip}: {onZip: (zip: string) => void}) {
       </div>
       <small className="coverage-source">Postal data: <a href={coverageSource.url} target="_blank" rel="noreferrer">GeoNames</a> · Checked September 5, 2026</small>
     </div>
-    {mapOpen ? <iframe allowFullScreen referrerPolicy="no-referrer-when-downgrade" src={business.mapEmbed} title="Appliance RS service location on Google Maps" /> : <button className="map-open" type="button" onClick={() => setMapOpen(true)}><IconMapPin size={19} /> Open interactive map <IconArrowRight size={17} /></button>}
+    <div className="map-heading"><IconMapPin size={19} /><strong>Our Upstate service area</strong></div>
+    <iframe allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade" src={business.mapEmbed} title="Appliance RS service location on Google Maps" />
     <a className="map-link" href={business.googleProfile} rel="noreferrer" target="_blank"><IconBrandGoogle /> Open Appliance RS on Google <IconArrowRight /></a>
   </div>;
 }

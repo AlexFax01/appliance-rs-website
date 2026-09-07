@@ -13,14 +13,14 @@ export default function PrivacyPage() {
         <Link className="text-link" href="/">← Back to Appliance RS</Link>
         <p className="eyebrow">Privacy</p>
         <h1>Your request stays focused on your repair.</h1>
-        <p>Appliance RS uses the information you submit to respond to your service request, confirm details, and arrange an appointment. We do not sell the information submitted through this website.</p>
+        <p>The request form prepares a text message on your device. Nothing is sent automatically: you review the message and choose whether to send it to Appliance RS. We do not sell information entered on this website.</p>
         <h2>Information collected</h2>
-        <p>The callback form may collect your name, phone number, email, ZIP code, appliance type, selected problems, brand, model, service details, contact preference, and preferred time.</p>
+        <p>The form may include your name, phone number, email, ZIP code, appliance type, selected problems, brand, model, service details, contact preference, and preferred time in the SMS that opens on your device.</p>
         <h2>Optional photographs</h2>
-        <p>You may attach up to three photos of your appliance, error code, or model label. Your browser resizes them before sending. Photos are delivered privately as email attachments to the service team to help assess your request; they are not published on this website. Please avoid including people, payment information, or unrelated personal details. Submitted information and photos may remain in the business email inbox; contact us to request deletion.</p>
+        <p>You may preview up to three photos of your appliance, error code, or model label. Your browser prepares local previews, but the website cannot attach photos to an SMS automatically. Add the photos yourself in Messages after it opens. The previews are not uploaded to this website or published. Please avoid including people, payment information, or unrelated personal details.</p>
         <h2>Questions or deletion requests</h2>
         <p>Contact us at <a href={`mailto:${business.email}`}>{business.email}</a> or call <a href={`tel:${business.phoneHref}`}>{business.phoneDisplay}</a>.</p>
-        <p className="legal-updated">Last updated September 5, 2026.</p>
+        <p className="legal-updated">Last updated September 7, 2026.</p>
       </article>
     </main>
   );

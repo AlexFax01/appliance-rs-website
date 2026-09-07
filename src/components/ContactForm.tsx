@@ -1,10 +1,10 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
-import { IconAlertCircle, IconCircleCheck, IconSend } from "@tabler/icons-react";
+import { IconAlertCircle, IconMessage, IconSend } from "@tabler/icons-react";
 import { appliances, business, problemCatalog } from "@/content/site";
 
-type FormState = "idle" | "submitting" | "success" | "error" | "preview";
+type FormState = "idle" | "preparing" | "ready" | "error";
 
 export function ContactForm({ selectedAppliance, onApplianceChange, selectedProblemIds, onProblemsChange, zip, onZipChange }: { selectedAppliance: string; onApplianceChange: (value: string) => void; selectedProblemIds: string[]; onProblemsChange: (ids: string[]) => void; zip: string; onZipChange: (zip: string) => void }) {
   const [state, setState] = useState<FormState>("idle");
@@ -14,9 +14,8 @@ export function ContactForm({ selectedAppliance, onApplianceChange, selectedProb
   const [photos, setPhotos] = useState<{file: File; url: string}[]>([]);
   const [photoError, setPhotoError] = useState("");
   const [preparing, setPreparing] = useState(false);
+  const [smsHref, setSmsHref] = useState("");
   const photoUrls = useRef(new Set<string>());
-  const endpoint = process.env.NEXT_PUBLIC_CONTACT_ENDPOINT ?? "/api/contact";
-  const isPreview = (process.env.NEXT_PUBLIC_SITE_STAGE ?? "preview") !== "production";
 
   useEffect(() => {
     startedAt.current = Date.now();
@@ -47,13 +46,13 @@ export function ContactForm({ selectedAppliance, onApplianceChange, selectedProb
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (preparing || state === "submitting") return;
-    const formElement = event.currentTarget;
-    setState("submitting");
+    if (preparing || state === "preparing") return;
+    setState("preparing");
     setMessage("");
+    setSmsHref("");
     setErrors({});
 
-    const form = new FormData(formElement);
+    const form = new FormData(event.currentTarget);
     const payload = {
       name: String(form.get("name") ?? ""),
       phone: String(form.get("phone") ?? ""),
@@ -89,31 +88,33 @@ export function ContactForm({ selectedAppliance, onApplianceChange, selectedProb
       return;
     }
 
-    try {
-      const body = new FormData(); body.append("payload", JSON.stringify(parsed.data));
-      photos.forEach(photo => body.append("photos[]", photo.file));
-      const response = await fetch(endpoint, {method: "POST", body});
-      const result = (await response.json().catch(() => null)) as { ok?: boolean; message?: string; fieldErrors?: Record<string, string[]> } | null;
-      if (response.ok && result?.ok === true) {
-        setState("success");
-        setMessage("Thanks — your request was sent. Appliance RS will follow up soon.");
-        formElement.reset(); photos.forEach(photo => {URL.revokeObjectURL(photo.url); photoUrls.current.delete(photo.url);}); setPhotos([]); onProblemsChange([]); onZipChange("");
-        startedAt.current = Date.now();
-        return;
-      }
-      if (response.status === 404 && isPreview) {
-        setState("preview");
-        setMessage("Preview check passed. Email delivery activates when the demo endpoint is configured.");
-        return;
-      }
-      if (result?.fieldErrors) {
-        setErrors(Object.fromEntries(Object.entries(result.fieldErrors).map(([key, value]) => [key, value[0]])));
-      }
-      throw new Error(result?.message ?? "We couldn’t send the request right now.");
-    } catch (error) {
-      setState("error");
-      setMessage(error instanceof Error ? `${error.message} Please call or text ${business.phoneDisplay}.` : `Please call or text ${business.phoneDisplay}.`);
-    }
+    const appliance = options.find(item => item.value === parsed.data.applianceType)?.title ?? "Other appliance";
+    const selectedLabels = (problemCatalog[parsed.data.applianceType] ?? [])
+      .filter(problem => parsed.data.selectedProblemIds.includes(problem.id))
+      .map(problem => problem.label);
+    const lines = [
+      "Hi Appliance RS, I would like to request appliance repair.",
+      "",
+      `Name: ${parsed.data.name}`,
+      `My callback number: ${parsed.data.phone}`,
+      parsed.data.email ? `Email: ${parsed.data.email}` : "",
+      `Appliance: ${appliance}`,
+      parsed.data.brand ? `Brand: ${parsed.data.brand}` : "",
+      parsed.data.model ? `Model: ${parsed.data.model}` : "",
+      selectedLabels.length ? `Common problems: ${selectedLabels.join("; ")}` : "",
+      parsed.data.problem ? `Details: ${parsed.data.problem}` : "",
+      `ZIP code: ${parsed.data.zipCode}`,
+      `Best time: ${parsed.data.bestTime}`,
+      `Preferred reply: ${parsed.data.preferredContact}`,
+      parsed.data.fallbackToText ? "If I miss your call, please text me." : "",
+      photos.length ? `Photos: I selected ${photos.length} photo${photos.length === 1 ? "" : "s"} and will attach ${photos.length === 1 ? "it" : "them"} in Messages.` : "",
+    ].filter(Boolean).join("\n");
+    const separator = /iPad|iPhone|iPod/.test(navigator.userAgent) ? "&" : "?";
+    const href = `sms:${business.phoneHref}${separator}body=${encodeURIComponent(lines)}`;
+    setSmsHref(href);
+    setState("ready");
+    setMessage("Your service request is ready. Review the text in Messages, attach any photos, and press Send.");
+    window.setTimeout(() => document.getElementById("sms-ready-link")?.click(), 0);
   }
 
   return (
@@ -152,19 +153,19 @@ export function ContactForm({ selectedAppliance, onApplianceChange, selectedProb
         </Field>
       </div>
       <div className="photo-upload">
-        <label htmlFor="repair-photos">Photos (optional)</label>
+        <label htmlFor="repair-photos">Photos to attach in Messages (optional)</label>
         <p>Show us the appliance, error code, or model label. Look around the door frame or an accessible label; don’t disassemble or move the appliance.</p>
-        <input id="repair-photos" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif" multiple onChange={addPhotos} disabled={preparing || state === "submitting"} aria-describedby="photo-help photo-feedback" />
-        <small id="photo-help">Up to 3 photos · JPEG, PNG or WebP · Automatically resized to 1 MB each. HEIC works when your browser can open it.</small>
+        <input id="repair-photos" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif" multiple onChange={addPhotos} disabled={preparing || state === "preparing"} aria-describedby="photo-help photo-feedback" />
+        <small id="photo-help">Up to 3 photos · JPEG, PNG or WebP. SMS links cannot attach files automatically, so add these photos in Messages after it opens.</small>
         <div id="photo-feedback" role="status">{preparing ? "Preparing your photos…" : photoError ? <p className="field-error">{photoError}</p> : null}</div>
         <div className="photo-previews">{photos.map(photo => <div className="photo-preview" key={photo.url}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={photo.url} alt={`Attachment preview: ${photo.file.name}`} /><span>{photo.file.name}</span><small>{Math.ceil(photo.file.size / 1000)} KB</small><button type="button" onClick={() => removePhoto(photo.url)} disabled={preparing || state === "submitting"} aria-label={`Remove ${photo.file.name}`}>Remove</button>
+          <img src={photo.url} alt={`Attachment preview: ${photo.file.name}`} /><span>{photo.file.name}</span><small>{Math.ceil(photo.file.size / 1000)} KB</small><button type="button" onClick={() => removePhoto(photo.url)} disabled={preparing || state === "preparing"} aria-label={`Remove ${photo.file.name}`}>Remove</button>
         </div>)}</div>
       </div>
 
       <fieldset className="contact-method">
-        <legend>How should we contact you?</legend>
+        <legend>How should we reply?</legend>
         <label><input defaultChecked name="preferredContact" type="radio" value="call" /> Call</label>
         <label><input name="preferredContact" type="radio" value="text" /> Text</label>
         <label><input name="preferredContact" type="radio" value="email" /> Email</label>
@@ -177,14 +178,14 @@ export function ContactForm({ selectedAppliance, onApplianceChange, selectedProb
 
       {message ? (
         <div aria-live="polite" className={`form-notice form-notice-${state}`} role="status">
-          {state === "success" ? <IconCircleCheck size={20} /> : <IconAlertCircle size={20} />}{message}
+          {state === "ready" ? <IconMessage size={20} /> : <IconAlertCircle size={20} />}<span>{message}{smsHref ? <> <a href={smsHref} id="sms-ready-link">Open the SMS again.</a></> : null}</span>
         </div>
       ) : null}
 
-      <button className="button-3d button-primary form-submit" disabled={state === "submitting" || preparing} type="submit">
-        <IconSend size={21} /> {state === "submitting" ? "Sending…" : "Request my callback"}
+      <button className="button-3d button-primary form-submit" disabled={state === "preparing" || preparing} type="submit">
+        <IconSend size={21} /> {state === "preparing" ? "Preparing your message…" : "Review & open SMS"}
       </button>
-      <p className="form-fineprint">No obligation. We’ll confirm the service details before scheduling.</p>
+      <p className="form-fineprint">Nothing is sent automatically. Your phone opens a prepared text to {business.phoneDisplay}, and you press Send.</p>
     </form>
   );
 }

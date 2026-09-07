@@ -10,6 +10,15 @@ The source offers a flat $85 service call, waived diagnostics with approved repa
 
 GeoNames US postal dataset: https://download.geonames.org/export/zip/US.zip — retrieved 2026-09-05, CC BY 4.0, https://www.geonames.org/export/. Exact South Carolina postal-place matches for the 19 existing site towns were retained, including PO-box ZIPs. These are postal matches, not service boundaries. Unknown ZIPs remain eligible to request service; all addresses require scheduling confirmation.
 
+## Service-area ordering
+
+The published service places are ordered by 2020 Census population using the U.S. Census Bureau TIGERweb South Carolina incorporated-place and census-designated-place tables (POP100), checked 2026-09-07:
+
+- https://tigerweb.geo.census.gov/tigerwebmain/Files/acs26/tigerweb_acs26_incplace_2020_tab20_sc.html
+- https://tigerweb.geo.census.gov/tigerwebmain/Files/acs26/tigerweb_acs26_cdp_2020_tab20_sc.html
+
+Greenville, Spartanburg, Greer, and Simpsonville are visually identified as the principal regional centers. Moore is an unincorporated community without a directly comparable Census-place population, so it follows the ranked places without a fabricated count.
+
 ## Google excerpts
 
 Original English review bodies and five-star graphics were checked on the exact business profile. Each curated record in `src/content/service-reviews.ts` links to its author's Google Maps review page. The UI identifies these as selected excerpts, not a live feed or complete review count.

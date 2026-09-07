@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useRef, useState } from "react";
-import { IconArrowRight, IconCheck, IconStarFilled, IconX } from "@tabler/icons-react";
+import { IconArrowRight, IconCheck, IconPhone, IconStarFilled, IconX } from "@tabler/icons-react";
 import { appliances, business, problemCatalog } from "@/content/site";
 import { reviewsFor, reviewsVerifiedAt } from "@/content/service-reviews";
 import { ModalFrame } from "./ModalFrame";
@@ -43,6 +43,12 @@ export function ServiceDialog({ service, selectedProblemIds, onProblemsChange, o
         </div>
       </div>
     </div>
-    <div className="service-dialog-footer"><span aria-live="polite">{selectedProblemIds.length ? `${selectedProblemIds.length} problem${selectedProblemIds.length === 1 ? "" : "s"} selected` : "Tell us what needs attention"}</span><button className="button-3d button-primary service-dialog-cta" onClick={() => { onClose(); onRequest(service.value); }} type="button">Request {service.title} repair <IconArrowRight /></button></div>
+    <div className="service-dialog-footer">
+      <span aria-live="polite">{selectedProblemIds.length ? `${selectedProblemIds.length} problem${selectedProblemIds.length === 1 ? "" : "s"} selected` : "Tell us what needs attention"}</span>
+      <div className="service-dialog-actions">
+        <button className="button-3d button-primary service-dialog-cta" onClick={() => { onClose(); onRequest(service.value); }} type="button">Request repair <IconArrowRight /></button>
+        <a className="button-3d button-orange service-dialog-call" href={`tel:${business.phoneHref}`}><IconPhone size={19} /> Call now</a>
+      </div>
+    </div>
   </ModalFrame>;
 }
