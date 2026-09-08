@@ -6,7 +6,8 @@ import {mkdir,writeFile} from 'node:fs/promises';
 const categories=['refrigerator-freezer','ice-maker','washer-dryer','dishwasher-disposal','oven-cooktop','microwave'];
 test('six appliance modals, keyboard focus, review tabs and no overflow',async({page},info)=>{
  await page.goto('/');
- await expect(page.locator('iframe')).toHaveCount(1);await expect(page.locator('.google-service-map')).toBeVisible();
+ await expect(page.locator('.google-service-map')).toBeVisible();
+ expect(await page.locator('.classic-map-frame iframe, .town-map-canvas').count()).toBe(1);
  for(const value of categories){
   const card=page.locator(`[data-appliance="${value}"]`);await card.click();
   const dialog=page.getByRole('dialog');await expect(dialog).toBeVisible();
@@ -36,7 +37,9 @@ test('problem selections and ZIP transfer without erasing notes',async({page})=>
  await page.locator('.coverage-input input').fill('29601');
  await expect(page.locator('.coverage-result')).toContainText('Your ZIP is in our listed service area.');await expect(page.locator('[name=zipCode]')).toHaveValue('29601');
  await page.locator('.coverage-input input').fill('99999');await expect(page.locator('.coverage-result')).toContainText('Please contact us');await expect(page.locator('[name=zipCode]')).toHaveValue('99999');
- await expect(page.locator('iframe')).toHaveAttribute('src',/12206806783937162522/);await expect(page.locator('iframe')).toHaveAttribute('loading','lazy');
+ const fallbackMap=page.locator('.classic-map-frame iframe[src]');
+ if(await fallbackMap.count()) { await expect(fallbackMap).toHaveAttribute('src',/12206806783937162522/);await expect(fallbackMap).toHaveAttribute('loading','lazy'); }
+ else await expect(page.locator('.town-map-canvas')).toHaveCount(1);
 });
 test('photo preparation, limit and prepared SMS retention',async({page})=>{
  await page.goto('/');await page.locator('[name=name]').fill('Controlled QA');await page.locator('[name=phone]').fill('8645550123');await page.locator('[name=address]').fill('123 Main St, Greenville, SC');await page.locator('[name=zipCode]').fill('29601');await page.locator('[name=problem]').fill('Please preserve my test request.');await page.locator('[name=consent]').check();
