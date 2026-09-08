@@ -6,7 +6,7 @@ import {mkdir,writeFile} from 'node:fs/promises';
 const categories=['refrigerator-freezer','ice-maker','washer-dryer','dishwasher-disposal','oven-cooktop','microwave'];
 test('six appliance modals, keyboard focus, review tabs and no overflow',async({page},info)=>{
  await page.goto('/');
- await expect(page.locator('iframe')).toHaveCount(0);await expect(page.locator('.service-map-preview')).toBeVisible();
+ await expect(page.locator('iframe')).toHaveCount(0);await expect(page.locator('.google-service-map')).toBeVisible();
  for(const value of categories){
   const card=page.locator(`[data-appliance="${value}"]`);await card.click();
   const dialog=page.getByRole('dialog');await expect(dialog).toBeVisible();
@@ -69,7 +69,9 @@ test('mobile menu, persistent contact and lazy map are usable',async({page})=>{
  const menu=page.getByRole('button',{name:'Toggle navigation'});await menu.click();await expect(page.getByRole('navigation',{name:'Mobile navigation'})).toBeVisible();
  await page.getByRole('navigation',{name:'Mobile navigation'}).getByRole('link',{name:'Appliances We Repair'}).click();await expect(page).toHaveURL(/#appliances$/);await expect(page.getByRole('navigation',{name:'Mobile navigation'})).toHaveCount(0);await expect(page.locator('#appliances')).toBeInViewport();
  await menu.click();await page.getByRole('navigation',{name:'Mobile navigation'}).getByRole('link',{name:'Service Areas'}).click();await expect(page).toHaveURL(/#areas$/);await expect(page.getByRole('navigation',{name:'Mobile navigation'})).toHaveCount(0);await expect(page.locator('#areas')).toBeInViewport();
- await expect(page.locator('.service-map-preview')).toBeVisible();await expect(page.locator('.map-city')).toHaveCount(5);await expect(page.locator('iframe')).toBeVisible();
+ await expect(page.locator('.google-service-map')).toBeVisible();await expect(page.locator('.service-city-link')).toHaveCount(19);await expect(page.locator('.service-city-link').first()).toContainText('Greenville');await expect(page.locator('.service-city-link').last()).toContainText('Moore');await expect(page.locator('iframe')).toBeVisible();
+ await page.getByRole('button',{name:'Inman'}).click();await expect(page.locator('.pulse-city-card')).toContainText('Inman, SC');await expect(page.locator('.pulse-city-card')).toContainText('29349');await expect(page.locator('.pulse-city-card').getByRole('link',{name:'Get directions'})).toHaveAttribute('href',/google\.com\/maps\/dir\/\?api=1/);
+ await page.getByRole('button',{name:'Explore Google map'}).click();await expect(page.locator('.pulse-visual-layer')).toHaveCount(0);await page.getByRole('button',{name:'Show service pulse'}).click();await expect(page.locator('.pulse-visual-layer')).toBeVisible();
  await expect(page.locator('.mobile-contact-bar .mobile-call')).toHaveAttribute('href','tel:+18649244349');await expect(page.locator('.mobile-contact-bar')).not.toContainText('Text');await expect(page.locator('.mobile-contact-bar')).toContainText('Request callback');
  await page.evaluate(() => document.querySelector<HTMLButtonElement>('.header-cta')?.click());await expect(page.getByRole('dialog')).toBeVisible();await expect(page.getByRole('dialog').getByRole('link',{name:'Send a text'})).toHaveCount(0);await expect(page.getByRole('dialog').getByRole('button',{name:'Request a callback'})).toBeVisible();await page.getByRole('button',{name:'Close contact options'}).click();
  await page.locator('[data-appliance="refrigerator-freezer"]').click();const dialog=page.getByRole('dialog');await expect(dialog.getByRole('button',{name:'Request repair'})).toBeVisible();await expect(dialog.getByRole('link',{name:'Call now'})).toBeVisible();

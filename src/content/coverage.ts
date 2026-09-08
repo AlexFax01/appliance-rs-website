@@ -15,6 +15,7 @@ const groups: [string, string[]][] = [
   ["Inman", ["29349"]], ["Landrum", ["29356"]], ["Lyman", ["29365"]],
   ["Moore", ["29369"]], ["Reidville", ["29375"]], ["Roebuck", ["29376"]], ["Wellford", ["29385"]],
 ];
+export const townZips: Record<string, string[]> = Object.fromEntries(groups);
 export const zipTowns: Record<string, string> = Object.fromEntries(groups.flatMap(([town, zips]) => zips.map(zip => [zip, town])));
 export function checkCoverage(zip: string) {
   const value = zip.trim();
