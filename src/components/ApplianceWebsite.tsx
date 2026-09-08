@@ -156,7 +156,7 @@ export function ApplianceWebsite() {
         <section className="section process-section" id="process">
           <div className="section-heading centered"><p className="eyebrow">Four clear steps</p><h2>Our Simple Process</h2></div>
           <ol className="process-list">
-            <Process number="1" title="Call or Text">Reach out any time. We’ll schedule a time that works for you.</Process>
+            <Process number="1" title="Call or Text">Call or text us 24/7. We’ll schedule a time that works for you.</Process>
             <Process number="2" title="On-Site Diagnosis">We find the issue and explain your options clearly.</Process>
             <Process number="3" title="Upfront Quote">You’ll know the cost before we start any work.</Process>
             <Process number="4" title="Expert Repair">We repair it right the first time and test everything.</Process>
@@ -192,7 +192,7 @@ export function ApplianceWebsite() {
         </section>
 
         <section className="section contact-section" id="contact">
-          <div className="contact-copy"><p className="eyebrow">Request service by text</p><h2>Tell us what’s going on. We’ll build the message.</h2><p>Complete the form and we’ll open a ready-to-send SMS to Appliance RS. Review it, add any photos you want to share, and press Send.</p><a className="contact-phone" href={`tel:${business.phoneHref}`}><IconPhone /> {business.phoneDisplay}</a><ul><li><IconCheck /> No-obligation request</li><li><IconCheck /> Your details stay in the message</li><li><IconCheck /> You choose when to send</li></ul></div>
+          <div className="contact-copy"><p className="eyebrow">Request service by text</p><h2>Tell us what’s going on. We’ll build the message.</h2><p>Complete the form and we’ll open a ready-to-send SMS to Appliance RS. Review it and press Send.</p><a className="contact-phone" href={`tel:${business.phoneHref}`}><IconPhone /> {business.phoneDisplay}</a><ul><li><IconCheck /> Calls and texts welcome 24/7</li><li><IconCheck /> Your details stay in the message</li><li><IconCheck /> You choose when to send</li></ul></div>
           <ContactForm selectedAppliance={selectedAppliance} onApplianceChange={setSelectedAppliance} selectedProblemIds={problemSelections[selectedAppliance] ?? []} onProblemsChange={ids => setProblems(selectedAppliance, ids)} zip={zip} onZipChange={setZip} />
         </section>
 

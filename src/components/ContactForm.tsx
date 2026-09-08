@@ -6,47 +6,28 @@ import { appliances, business, problemCatalog } from "@/content/site";
 
 type FormState = "idle" | "preparing" | "ready" | "error";
 
+const fieldOrder = [
+  "name", "phone", "address", "zipCode", "applianceType", "bestTime", "brand", "model",
+  "selectedProblemIds", "problem", "preferredContact", "consent",
+] as const;
+
 export function ContactForm({ selectedAppliance, onApplianceChange, selectedProblemIds, onProblemsChange, zip, onZipChange }: { selectedAppliance: string; onApplianceChange: (value: string) => void; selectedProblemIds: string[]; onProblemsChange: (ids: string[]) => void; zip: string; onZipChange: (zip: string) => void }) {
   const [state, setState] = useState<FormState>("idle");
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const startedAt = useRef(0);
-  const [photos, setPhotos] = useState<{file: File; url: string}[]>([]);
-  const [photoError, setPhotoError] = useState("");
-  const [preparing, setPreparing] = useState(false);
   const [smsHref, setSmsHref] = useState("");
-  const photoUrls = useRef(new Set<string>());
 
   useEffect(() => {
     startedAt.current = Date.now();
-    const urls = photoUrls.current;
-    return () => {urls.forEach(url => URL.revokeObjectURL(url));};
   }, []);
-
-  async function addPhotos(event: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(event.target.files ?? []); event.target.value = "";
-    if (!files.length) return;
-    if (files.length + photos.length > 3) {setPhotoError("You can attach up to 3 photos. Please remove a photo first."); return;}
-    setPreparing(true); setPhotoError("");
-    const prepared: {file: File; url: string}[] = [];
-    const failures: string[] = [];
-    try {
-      const {preparePhoto} = await import("@/lib/prepare-photo");
-      for (const original of files) {
-        try {const file = await preparePhoto(original); const url = URL.createObjectURL(file); photoUrls.current.add(url); prepared.push({file, url});}
-        catch (error) {failures.push(error instanceof Error ? error.message : "This photo could not be prepared.");}
-      }
-      setPhotos(current => [...current, ...prepared]); setPhotoError(failures.join(" "));
-    } catch {setPhotoError("Photo preparation could not load. Please try again. Your other details are saved.");}
-    finally {setPreparing(false);}
-  }
-  function removePhoto(url: string) {URL.revokeObjectURL(url); photoUrls.current.delete(url); setPhotos(current => current.filter(photo => photo.url !== url)); setPhotoError("");}
 
   const options = useMemo(() => [...appliances, { value: "other", title: "Other appliance" }], []);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (preparing || state === "preparing") return;
+    if (state === "preparing") return;
+    const formElement = event.currentTarget;
     setState("preparing");
     setMessage("");
     setSmsHref("");
@@ -85,6 +66,15 @@ export function ContactForm({ selectedAppliance, onApplianceChange, selectedProb
       setErrors(nextErrors);
       setState("error");
       setMessage("Please check the highlighted fields.");
+      const firstInvalidField = fieldOrder.find((field) => nextErrors[field]);
+      window.requestAnimationFrame(() => {
+        const selector = firstInvalidField === "selectedProblemIds"
+          ? ".selected-problems button"
+          : firstInvalidField ? `[name="${firstInvalidField}"]` : null;
+        const target = selector ? formElement.querySelector<HTMLElement>(selector) : null;
+        target?.focus({ preventScroll: true });
+        target?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
       return;
     }
 
@@ -107,13 +97,12 @@ export function ContactForm({ selectedAppliance, onApplianceChange, selectedProb
       `Best time: ${parsed.data.bestTime}`,
       `Preferred reply: ${parsed.data.preferredContact}`,
       parsed.data.fallbackToText ? "If I miss your call, please text me." : "",
-      photos.length ? `Photos: I selected ${photos.length} photo${photos.length === 1 ? "" : "s"} and will attach ${photos.length === 1 ? "it" : "them"} in Messages.` : "",
     ].filter(Boolean).join("\n");
     const separator = /iPad|iPhone|iPod/.test(navigator.userAgent) ? "&" : "?";
     const href = `sms:${business.phoneHref}${separator}body=${encodeURIComponent(lines)}`;
     setSmsHref(href);
     setState("ready");
-    setMessage("Your service request is ready. Review the text in Messages, attach any photos, and press Send.");
+    setMessage("Your service request is ready. Review the text in Messages and press Send.");
     window.setTimeout(() => document.getElementById("sms-ready-link")?.click(), 0);
   }
 
@@ -152,18 +141,6 @@ export function ContactForm({ selectedAppliance, onApplianceChange, selectedProb
           <textarea aria-invalid={Boolean(errors.problem)} name="problem" placeholder="Tell us more about what’s happening." required={!selectedProblemIds.length} rows={3} maxLength={1500} />
         </Field>
       </div>
-      <div className="photo-upload">
-        <label htmlFor="repair-photos">Photos to attach in Messages (optional)</label>
-        <p>Show us the appliance, error code, or model label. Look around the door frame or an accessible label; don’t disassemble or move the appliance.</p>
-        <input id="repair-photos" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif" multiple onChange={addPhotos} disabled={preparing || state === "preparing"} aria-describedby="photo-help photo-feedback" />
-        <small id="photo-help">Up to 3 photos · JPEG, PNG or WebP. SMS links cannot attach files automatically, so add these photos in Messages after it opens.</small>
-        <div id="photo-feedback" role="status">{preparing ? "Preparing your photos…" : photoError ? <p className="field-error">{photoError}</p> : null}</div>
-        <div className="photo-previews">{photos.map(photo => <div className="photo-preview" key={photo.url}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={photo.url} alt={`Attachment preview: ${photo.file.name}`} /><span>{photo.file.name}</span><small>{Math.ceil(photo.file.size / 1000)} KB</small><button type="button" onClick={() => removePhoto(photo.url)} disabled={preparing || state === "preparing"} aria-label={`Remove ${photo.file.name}`}>Remove</button>
-        </div>)}</div>
-      </div>
-
       <fieldset className="contact-method">
         <legend>How should we reply?</legend>
         <label><input defaultChecked name="preferredContact" type="radio" value="call" /> Call</label>
@@ -181,7 +158,7 @@ export function ContactForm({ selectedAppliance, onApplianceChange, selectedProb
         </div>
       ) : null}
 
-      <button className="button-3d button-primary form-submit" disabled={state === "preparing" || preparing} type="submit">
+      <button className="button-3d button-primary form-submit" disabled={state === "preparing"} type="submit">
         <IconSend size={21} /> {state === "preparing" ? "Preparing your message…" : "Review & open SMS"}
       </button>
       <p className="form-fineprint">Nothing is sent automatically. Your phone opens a prepared text to {business.phoneDisplay}, and you press Send.</p>

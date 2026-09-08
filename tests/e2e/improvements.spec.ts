@@ -1,8 +1,5 @@
 import {test,expect} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import path from 'node:path';
-import sharp from 'sharp';
-import {mkdir,writeFile} from 'node:fs/promises';
 const categories=['refrigerator-freezer','ice-maker','washer-dryer','dishwasher-disposal','oven-cooktop','microwave'];
 test('six appliance modals, keyboard focus, review tabs and no overflow',async({page},info)=>{
  await page.goto('/');
@@ -41,15 +38,11 @@ test('problem selections and ZIP transfer without erasing notes',async({page})=>
  if(await fallbackMap.count()) { await expect(fallbackMap).toHaveAttribute('src',/12206806783937162522/);await expect(fallbackMap).toHaveAttribute('loading','lazy'); }
  else await expect(page.locator('.town-map-canvas')).toHaveCount(1);
 });
-test('photo preparation, limit and prepared SMS retention',async({page})=>{
+test('prepared SMS retains the complete service request',async({page})=>{
  await page.goto('/');await page.locator('[name=name]').fill('Controlled QA');await page.locator('[name=phone]').fill('8645550123');await page.locator('[name=address]').fill('123 Main St, Greenville, SC');await page.locator('[name=zipCode]').fill('29601');await page.locator('[name=problem]').fill('Please preserve my test request.');await page.locator('[name=consent]').check();
- const photo=path.resolve('public/images/hero/hero-800.webp');
- await page.locator('#repair-photos').setInputFiles([photo,photo,photo]);await expect(page.locator('.photo-preview')).toHaveCount(3);
- await page.locator('#repair-photos').setInputFiles(photo);await expect(page.locator('#photo-feedback')).toContainText('up to 3');
- await page.locator('.photo-preview button').first().click();await expect(page.locator('.photo-preview')).toHaveCount(2);
- await page.locator('#repair-photos').setInputFiles({name:'bad.heic',mimeType:'image/heic',buffer:Buffer.from('not a real HEIC')});await expect(page.locator('#photo-feedback')).toContainText('JPEG');
- await page.getByRole('button',{name:'Review & open SMS'}).click();await expect(page.locator('.form-notice')).toContainText('ready');await expect(page.locator('.photo-preview')).toHaveCount(2);await expect(page.locator('[name=problem]')).toHaveValue('Please preserve my test request.');
- const sms=await page.locator('#sms-ready-link').getAttribute('href');expect(sms).toMatch(/^sms:\+18649244349[?&]body=/);expect(decodeURIComponent(sms!)).toContain('Name: Controlled QA');expect(decodeURIComponent(sms!)).toContain('Service address: 123 Main St, Greenville, SC');expect(decodeURIComponent(sms!)).toContain('I selected 2 photos');
+ await expect(page.locator('#repair-photos, .photo-upload')).toHaveCount(0);
+ await page.getByRole('button',{name:'Review & open SMS'}).click();await expect(page.locator('.form-notice')).toContainText('ready');await expect(page.locator('[name=problem]')).toHaveValue('Please preserve my test request.');
+ const sms=await page.locator('#sms-ready-link').getAttribute('href');expect(sms).toMatch(/^sms:\+18649244349[?&]body=/);expect(decodeURIComponent(sms!)).toContain('Name: Controlled QA');expect(decodeURIComponent(sms!)).toContain('Service address: 123 Main St, Greenville, SC');expect(decodeURIComponent(sms!)).not.toContain('Photos:');
 });
 test('pricing, reduced motion and accessibility',async({page})=>{
  await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/');await page.locator('.price-card').click();
@@ -57,14 +50,21 @@ test('pricing, reduced motion and accessibility',async({page})=>{
  await page.locator('[data-appliance="refrigerator-freezer"]').click();await expect(page.getByRole('dialog')).toBeVisible();expect((await new AxeBuilder({page}).analyze()).violations).toEqual([]);await page.keyboard.press('Escape');
  expect(await page.locator('.hero-picture').evaluate(el=>getComputedStyle(el).transform)).toBe('none');
 });
-test('selected-only request and readable model photo',async({page},info)=>{
+test('selected-only request works without a written description',async({page})=>{
  await page.goto('/');await page.locator('[data-appliance="washer-dryer"]').click();
  const dialog=page.getByRole('dialog');await dialog.locator('.problem-option').nth(1).click();await dialog.locator('.service-dialog-cta').click();
  await page.locator('[name=name]').fill('Controlled QA');await page.locator('[name=phone]').fill('8645550123');await page.locator('[name=address]').fill('456 Oak Ave, Greer, SC');await page.locator('[name=zipCode]').fill('99999');await page.locator('[name=consent]').check();
- const buffer=await sharp(Buffer.from('<svg width="3200" height="2400" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="white"/><text x="250" y="800" font-size="150" font-family="Arial">MODEL: WRS325SDHZ08</text><text x="250" y="1100" font-size="150" font-family="Arial">SERIAL: QA-123456789</text></svg>')).png().toBuffer();
- await page.locator('#repair-photos').setInputFiles({name:'model-label.png',mimeType:'image/png',buffer});await expect(page.locator('.photo-preview')).toHaveCount(1);
- const preview=page.locator('.photo-preview img');const processed=Buffer.from(await preview.evaluate(async image=>new Uint8Array(await (await fetch((image as HTMLImageElement).src)).arrayBuffer())));await mkdir('artifacts',{recursive:true});await writeFile(`artifacts/model-photo-${info.project.name}.jpg`,processed);expect(processed.byteLength).toBeLessThanOrEqual(1_000_000);
- await page.getByRole('button',{name:'Review & open SMS'}).click();await expect(page.locator('.form-notice')).toContainText('ready');await expect(page.locator('.photo-preview')).toHaveCount(1);const sms=decodeURIComponent((await page.locator('#sms-ready-link').getAttribute('href'))!);expect(sms).toContain('Common problems: Dryer not heating');
+ await page.getByRole('button',{name:'Review & open SMS'}).click();await expect(page.locator('.form-notice')).toContainText('ready');const sms=decodeURIComponent((await page.locator('#sms-ready-link').getAttribute('href'))!);expect(sms).toContain('Common problems: Dryer not heating');
+});
+
+test('invalid form moves focus and scrolls to the first field that needs attention',async({page})=>{
+ await page.goto('/');await page.locator('#contact').scrollIntoViewIfNeeded();await page.getByRole('button',{name:'Review & open SMS'}).click();
+ await expect(page.locator('[name=name]')).toBeFocused();await expect(page.locator('[name=name]')).toBeInViewport();await expect(page.locator('.form-notice')).toContainText('highlighted fields');
+});
+
+test('unknown routes show the branded non-indexable 404 page',async({page})=>{
+ const response=await page.goto('/this-page-does-not-exist');expect(response?.status()).toBe(404);
+ await expect(page.getByRole('heading',{name:/This page isn’t here/})).toBeVisible();await expect(page.getByRole('link',{name:'Back to home'})).toHaveAttribute('href','/');
 });
 
 test('mobile menu, persistent contact and lazy map are usable',async({page})=>{
