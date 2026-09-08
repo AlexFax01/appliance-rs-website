@@ -15,7 +15,7 @@ export default function PrivacyPage() {
         <h1>Your request stays focused on your repair.</h1>
         <p>The request form prepares a text message on your device. Nothing is sent automatically: you review the message and choose whether to send it to Appliance RS. We do not sell information entered on this website.</p>
         <h2>Information collected</h2>
-        <p>The form may include your name, phone number, email, ZIP code, appliance type, selected problems, brand, model, service details, contact preference, and preferred time in the SMS that opens on your device.</p>
+        <p>The form may include your name, phone number, email, service address, ZIP code, appliance type, selected problems, brand, model, service details, contact preference, and preferred time in the SMS that opens on your device.</p>
         <h2>Optional photographs</h2>
         <p>You may preview up to three photos of your appliance, error code, or model label. Your browser prepares local previews, but the website cannot attach photos to an SMS automatically. Add the photos yourself in Messages after it opens. The previews are not uploaded to this website or published. Please avoid including people, payment information, or unrelated personal details.</p>
         <h2>Questions or deletion requests</h2>

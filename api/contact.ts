@@ -52,6 +52,7 @@ function textBody(payload: ContactPayload, requestId: string) {
     `Brand: ${payload.brand || "Not provided"}`,
     `Model: ${payload.model || "Not provided"}`,
     `Selected problems: ${selectedProblems(payload)}`,
+    `Service address: ${payload.address}`,
     `ZIP: ${payload.zipCode}`,
     `Preferred contact: ${payload.preferredContact}`,
     `Best time: ${payload.bestTime}`,
@@ -70,6 +71,7 @@ function htmlBody(payload: ContactPayload, requestId: string) {
     ["Email", payload.email || "Not provided"], ["Appliance", payload.applianceType],
     ["Brand", payload.brand || "Not provided"], ["Model", payload.model || "Not provided"],
     ["Selected problems", selectedProblems(payload)],
+    ["Service address", payload.address],
     ["ZIP", payload.zipCode], ["Preferred contact", payload.preferredContact],
     ["Best time", payload.bestTime], ["Text fallback", payload.fallbackToText ? "Yes" : "No"],
   ];

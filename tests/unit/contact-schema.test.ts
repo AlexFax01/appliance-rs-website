@@ -3,7 +3,7 @@ import { contactSchema } from "@/lib/contact-schema";
 
 const valid = {
   name: "Jane Smith", phone: "864-555-0123", email: "", applianceType: "refrigerator-freezer",
-  problem: "The refrigerator is no longer cooling.", zipCode: "29601", preferredContact: "call",
+  problem: "The refrigerator is no longer cooling.", address: "123 Main St, Greenville, SC", zipCode: "29601", preferredContact: "call",
   bestTime: "Morning", fallbackToText: true, consent: true, website: "", formStartedAt: 1,
 };
 
@@ -14,4 +14,5 @@ describe("contactSchema", () => {
     expect(result.success).toBe(false);
   });
   it("rejects an invalid ZIP code", () => expect(contactSchema.safeParse({ ...valid, zipCode: "abc" }).success).toBe(false));
+  it("requires a service address", () => expect(contactSchema.safeParse({ ...valid, address: "" }).success).toBe(false));
 });

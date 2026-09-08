@@ -2,7 +2,7 @@
 
 ## Business identity and pricing
 
-Source: https://appliancesc.com/ (phone 864-924-4349). Google knowledge ID `/g/11z7t4g7sf`; Maps CID `12206806783937162522`. The similarly named Colorado company is not this business. The embedded map was visually checked for the Upstate SC service area and Appliance RS LLC profile. The lightweight 3D preview is a decorative illustration, not a geographic boundary; its five HTML city markers link to Google Maps searches, while the live company map loads only after explicit interaction.
+Source: https://appliancesc.com/ (phone 864-924-4349). Google knowledge ID `/g/11z7t4g7sf`; Maps CID `12206806783937162522`. The similarly named Colorado company is not this business. The embedded map was visually checked for the Upstate SC service area and Appliance RS LLC profile. The lightweight 3D preview is a decorative illustration, not a geographic boundary; its five HTML city markers link to Google Maps searches, while the adjacent live company map is deferred until the section approaches the viewport.
 
 The source offers a flat $85 service call, waived diagnostics with approved repair, a quote before work, and payment after work. No guarantee period or final repair estimate has been invented. Shared wording lives in `src/content/site.ts`.
 

@@ -16,6 +16,7 @@ export const contactSchema = z.object({
   selectedProblemIds: z.array(z.string().max(80)).max(4).default([]),
   brand: z.string().trim().max(80).default(""),
   model: z.string().trim().max(100).default(""),
+  address: z.string().trim().min(5, "Please enter the service address.").max(200),
   zipCode: z.string().trim().regex(/^\d{5}(?:-\d{4})?$/, "Please enter a valid ZIP code."),
   preferredContact: z.enum(contactMethods),
   bestTime: z.string().trim().min(2, "Please choose the best time to reach you.").max(80),

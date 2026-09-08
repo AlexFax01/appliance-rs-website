@@ -39,6 +39,7 @@ $model = clean($raw['model'] ?? '');
 $selected = $raw['selectedProblemIds'] ?? [];
 $catalogPath = is_file(__DIR__ . '/problems.json') ? __DIR__ . '/problems.json' : __DIR__ . '/../../src/content/problems.json';
 $catalog = json_decode((string)file_get_contents($catalogPath), true);
+$address = clean($raw['address'] ?? '', 200);
 $zip = clean($raw['zipCode'] ?? '', 10);
 $preferred = clean($raw['preferredContact'] ?? '', 10);
 $bestTime = clean($raw['bestTime'] ?? '', 80);
@@ -61,6 +62,7 @@ if (!is_array($selected) || !array_is_list($selected) || count($selected) > 4 ||
 if ((!count($selected) && mb_strlen($problem) < 10) || mb_strlen($problem) > 1500) $errors['problem'] = ['Select a problem or briefly describe what is happening.'];
 if (mb_strlen($brand) > 80) $errors['brand'] = ['Use up to 80 characters.'];
 if (mb_strlen($model) > 100) $errors['model'] = ['Use up to 100 characters.'];
+if (mb_strlen($address) < 5 || mb_strlen($address) > 200) $errors['address'] = ['Please enter the service address.'];
 if (mb_strlen($bestTime) < 2 || mb_strlen($bestTime) > 80) $errors['bestTime'] = ['Please choose the best time to reach you.'];
 if (isset($raw['fallbackToText']) && !is_bool($raw['fallbackToText'])) $errors['fallbackToText'] = ['Invalid choice.'];
 if (!preg_match('/^\d{5}(?:-\d{4})?$/', $zip)) $errors['zipCode'] = ['Please enter a valid ZIP code.'];
@@ -110,7 +112,7 @@ if (!is_file($autoload)) respond(502, ['ok' => false, 'code' => 'delivery_not_co
 require $autoload;
 
 $requestId = bin2hex(random_bytes(8));
-$body = "New Appliance RS callback request ({$requestId})\n\nName: {$name}\nPhone: {$phone}\nEmail: " . ($email ?: 'Not provided') . "\nAppliance: {$appliance}\nZIP: {$zip}\nPreferred contact: {$preferred}\nBest time: {$bestTime}\nText fallback: " . (($raw['fallbackToText'] ?? false) ? 'Yes' : 'No') . "\n\nProblem:\n{$problem}";
+$body = "New Appliance RS callback request ({$requestId})\n\nName: {$name}\nPhone: {$phone}\nEmail: " . ($email ?: 'Not provided') . "\nAppliance: {$appliance}\nService address: {$address}\nZIP: {$zip}\nPreferred contact: {$preferred}\nBest time: {$bestTime}\nText fallback: " . (($raw['fallbackToText'] ?? false) ? 'Yes' : 'No') . "\n\nProblem:\n{$problem}";
 $labels = array_column(array_filter($catalog[$appliance] ?? [], fn($item) => in_array($item['id'], $selected, true)), 'label');
 $body .= "\n\nBrand: " . ($brand ?: 'Not provided') . "\nModel: " . ($model ?: 'Not provided') . "\nSelected problems: " . (implode('; ', $labels) ?: 'None selected');
 

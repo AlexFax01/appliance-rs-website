@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IconMapPin, IconArrowRight, IconBrandGoogle } from "@tabler/icons-react";
 import { checkCoverage, coverageSource } from "@/content/coverage";
 import { business } from "@/content/site";
@@ -18,7 +18,21 @@ const cityMapUrl = (name: string) =>
 export function CoverageChecker({onZip}: {onZip: (zip: string) => void}) {
   const [zip, setZip] = useState("");
   const [result, setResult] = useState<ReturnType<typeof checkCoverage> | null>(null);
-  const [mapOpen, setMapOpen] = useState(false);
+  const [googleReady, setGoogleReady] = useState(false);
+  const mapsRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const target = mapsRef.current;
+    if (!target) return;
+    if (!("IntersectionObserver" in window)) {
+      const fallback = globalThis.setTimeout(() => setGoogleReady(true), 0);
+      return () => globalThis.clearTimeout(fallback);
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {setGoogleReady(true); observer.disconnect();}
+    }, {rootMargin: "200px 0px"});
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, []);
   const evaluate = (value: string, showInvalid = true) => {
     const answer = checkCoverage(value);
     if (answer.status === "invalid" && !showInvalid) {
@@ -42,23 +56,26 @@ export function CoverageChecker({onZip}: {onZip: (zip: string) => void}) {
       </div>
       <small className="coverage-source">Postal data: <a href={coverageSource.url} target="_blank" rel="noreferrer">GeoNames</a> · Checked September 5, 2026</small>
     </div>
-    {mapOpen ? <div className="interactive-map">
-      <iframe allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade" src={business.mapEmbed} title="Appliance RS service location on Google Maps" />
-      <button className="map-close" type="button" onClick={() => setMapOpen(false)}>Back to service area</button>
-    </div> : <div className="service-map-preview">
-      <div className="service-map-visual">
-        <picture>
-          <source srcSet="/images/map/upstate-service-area-3d.avif" type="image/avif" />
-          <img src="/images/map/upstate-service-area-3d.webp" alt="" width="960" height="640" loading="lazy" decoding="async" />
-        </picture>
-        {mapCities.map(city => <a className={`map-city map-city-${city.position}`} href={cityMapUrl(city.name)} key={city.name} rel="noreferrer" target="_blank" aria-label={`Open ${city.name}, South Carolina in Google Maps`}><span>{city.name}</span></a>)}
+    <div className="map-duo" ref={mapsRef}>
+      <div className="service-map-preview">
+        <div className="map-pane-heading"><IconMapPin size={18} /><strong>3D service area</strong></div>
+        <div className="service-map-visual">
+          <picture>
+            <source srcSet="/images/map/upstate-service-area-3d.avif" type="image/avif" />
+            <img src="/images/map/upstate-service-area-3d.webp" alt="" width="960" height="640" loading="lazy" decoding="async" />
+          </picture>
+          {mapCities.map(city => <a className={`map-city map-city-${city.position}`} href={cityMapUrl(city.name)} key={city.name} rel="noreferrer" target="_blank" aria-label={`Open ${city.name}, South Carolina in Google Maps`}><span>{city.name}</span></a>)}
+        </div>
+        <div className="map-preview-copy">
+          <span className="map-preview-icon"><IconMapPin size={24} /></span>
+          <div><p className="eyebrow">Our Upstate service area</p><h3>Where Appliance RS works</h3><p>Select a city marker to open it in Google Maps.</p></div>
+        </div>
       </div>
-      <div className="map-preview-copy">
-        <span className="map-preview-icon"><IconMapPin size={24} /></span>
-        <div><p className="eyebrow">Our Upstate service area</p><h3>See where Appliance RS works</h3><p>Explore our main service towns without loading a live map.</p></div>
-        <button className="button-3d button-primary" type="button" onClick={() => setMapOpen(true)}>Explore interactive map <IconArrowRight size={18} /></button>
+      <div className="google-map-pane">
+        <div className="map-pane-heading"><IconBrandGoogle size={18} /><strong>Google Maps</strong></div>
+        {googleReady ? <iframe allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade" src={business.mapEmbed} title="Appliance RS service location on Google Maps" /> : <div className="google-map-placeholder"><IconBrandGoogle size={28} /><strong>Google map loads when you reach this section</strong><button type="button" onClick={() => setGoogleReady(true)}>Load map now</button></div>}
       </div>
-    </div>}
+    </div>
     <a className="map-link" href={business.googleProfile} rel="noreferrer" target="_blank"><IconBrandGoogle /> Open Appliance RS on Google <IconArrowRight /></a>
   </div>;
 }

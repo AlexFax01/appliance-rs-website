@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { IconMessage, IconPhone, IconX } from "@tabler/icons-react";
+import { IconPhone, IconX } from "@tabler/icons-react";
 import { business } from "@/content/site";
 
 type ContactChooserProps = {
@@ -47,13 +47,10 @@ export function ContactChooser({ open, onClose, onRequestCallback }: ContactChoo
         </button>
         <p className="eyebrow">How can we help?</p>
         <h2 id="contact-dialog-title">Choose the easiest way to reach us.</h2>
-        <p className="dialog-copy">Call or text now, or send a short callback request and we’ll follow up.</p>
+        <p className="dialog-copy">Call now or complete a short callback request and we’ll follow up.</p>
         <div className="dialog-actions">
           <a className="button-3d button-orange" href={`tel:${business.phoneHref}`}>
             <IconPhone size={22} /> Call now
-          </a>
-          <a className="button-3d button-secondary" href={`sms:${business.phoneHref}`}>
-            <IconMessage size={22} /> Send a text
           </a>
           <button
             className="button-3d button-outline"

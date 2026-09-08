@@ -15,7 +15,7 @@ await cp('src/content/problems.json',join(root,'problems.json'));
 await cp('tests/php/mail-stub.php',join(root,'vendor/autoload.php'));
 const capture=join(root,'capture.json');
 const child=spawn(runtime,['php-server','--root',root,'--listen','127.0.0.1:3199'],{env:{...process.env,SMTP_HOST:'local-test',SMTP_USER:'local-test',SMTP_PASS:'local-test',CONTACT_FROM_EMAIL:'qa@example.invalid',TEST_MAIL_CAPTURE:capture},stdio:'ignore'});
-const valid={name:'Local QA',phone:'8645550123',email:'',applianceType:'washer-dryer',selectedProblemIds:['dryer-not-heating'],problem:'',brand:'QA',model:'TEST-123',zipCode:'99999',bestTime:'Anytime',preferredContact:'call',consent:true,formStartedAt:1};
+const valid={name:'Local QA',phone:'8645550123',email:'',applianceType:'washer-dryer',selectedProblemIds:['dryer-not-heating'],problem:'',brand:'QA',model:'TEST-123',address:'123 Main St, Greenville, SC',zipCode:'99999',bestTime:'Anytime',preferredContact:'call',consent:true,formStartedAt:1};
 let checks=0;
 async function send(payload=valid,count=0,bytes,mime='image/webp'){
  const form=new FormData();form.append('payload',JSON.stringify(payload));

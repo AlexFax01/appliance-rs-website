@@ -212,7 +212,7 @@ export function ApplianceWebsite() {
         <p>© 2026 Appliance RS. All rights reserved.</p><div className="footer-links"><Link href="/privacy">Privacy</Link><span>Fully Insured</span><span>Pay After Repair</span><span>Clear Pricing</span></div>
       </footer>
 
-      <nav aria-label="Quick contact" className="mobile-contact-bar"><a className="mobile-call" href={`tel:${business.phoneHref}`}><IconPhone /> Call</a><a href={`sms:${business.phoneHref}`}><IconMessageCircle /> Text</a><button onClick={() => requestCallback()} type="button">Start SMS request</button></nav>
+      <nav aria-label="Quick contact" className="mobile-contact-bar"><a className="mobile-call" href={`tel:${business.phoneHref}`}><IconPhone /> Call</a><button onClick={() => requestCallback()} type="button"><IconMessageCircle /> Request callback</button></nav>
       {expandedApplianceDetails ? <ServiceDialog key={expandedApplianceDetails.value} onClose={() => setExpandedAppliance(null)} onRequest={requestCallback} service={expandedApplianceDetails} selectedProblemIds={problemSelections[expandedApplianceDetails.value] ?? []} onProblemsChange={ids => setProblems(expandedApplianceDetails.value, ids)} /> : null}
       {priceOpen ? <PriceDialog onClose={() => setPriceOpen(false)} onRequest={() => requestCallback()} /> : null}
       <ContactChooser onClose={() => setContactOpen(false)} onRequestCallback={() => requestCallback()} open={contactOpen} />

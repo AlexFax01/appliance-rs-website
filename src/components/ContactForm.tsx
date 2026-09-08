@@ -62,6 +62,7 @@ export function ContactForm({ selectedAppliance, onApplianceChange, selectedProb
       selectedProblemIds,
       brand: String(form.get("brand") ?? ""),
       model: String(form.get("model") ?? ""),
+      address: String(form.get("address") ?? ""),
       zipCode: String(form.get("zipCode") ?? ""),
       preferredContact: String(form.get("preferredContact") ?? "call"),
       bestTime: String(form.get("bestTime") ?? "Anytime"),
@@ -103,6 +104,7 @@ export function ContactForm({ selectedAppliance, onApplianceChange, selectedProb
       parsed.data.model ? `Model: ${parsed.data.model}` : "",
       selectedLabels.length ? `Common problems: ${selectedLabels.join("; ")}` : "",
       parsed.data.problem ? `Details: ${parsed.data.problem}` : "",
+      `Service address: ${parsed.data.address}`,
       `ZIP code: ${parsed.data.zipCode}`,
       `Best time: ${parsed.data.bestTime}`,
       `Preferred reply: ${parsed.data.preferredContact}`,
@@ -128,6 +130,9 @@ export function ContactForm({ selectedAppliance, onApplianceChange, selectedProb
         </Field>
         <Field label="Email (optional)" error={errors.email}>
           <input aria-invalid={Boolean(errors.email)} autoComplete="email" inputMode="email" name="email" placeholder="jane@example.com" type="email" />
+        </Field>
+        <Field className="form-span" label="Service address" error={errors.address}>
+          <input aria-invalid={Boolean(errors.address)} autoComplete="street-address" name="address" placeholder="123 Main St, Greenville, SC" maxLength={200} required />
         </Field>
         <Field label="ZIP code" error={errors.zipCode}>
           <input aria-invalid={Boolean(errors.zipCode)} autoComplete="postal-code" inputMode="numeric" maxLength={10} name="zipCode" placeholder="29601" value={zip} onChange={event => onZipChange(event.target.value)} required />
