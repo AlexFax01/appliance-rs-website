@@ -2,7 +2,7 @@
 
 ## Business identity and pricing
 
-Source: https://appliancesc.com/ (phone 864-924-4349). Google knowledge ID `/g/11z7t4g7sf`; Maps CID `12206806783937162522`. The similarly named Colorado company is not this business. The embedded map was visually checked for the Upstate SC service area and Appliance RS LLC profile. The live company map is deferred until the section approaches the viewport. “Service Pulse” is a transparent HTML presentation layer rather than Google boundary data; its town details use the verified GeoNames ZIP table. The map is for communicating where the technician works, not routing customers to a business location.
+Source: https://appliancesc.com/ (phone 864-924-4349). Google knowledge ID `/g/11z7t4g7sf`; Maps CID `12206806783937162522`. The similarly named Colorado company is not this business. The embedded map was visually checked for the Upstate SC service area and Appliance RS LLC profile. A lightweight illustration appears first and makes no boundary claim; the live Google map loads only after an explicit click. The separate service-area list and ZIP checker communicate the confirmed towns. The map is for showing where the technician works, not routing customers to a business location.
 
 The source offers a flat $85 service call, waived diagnostics with approved repair, a quote before work, and payment after work. No guarantee period or final repair estimate has been invented. Shared wording lives in `src/content/site.ts`.
 
