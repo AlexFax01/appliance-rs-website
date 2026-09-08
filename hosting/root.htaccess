@@ -4,6 +4,8 @@ ErrorDocument 404 /404.html
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
+  RewriteCond %{HTTP_HOST} ^www\.appliancesc\.com$ [NC]
+  RewriteRule ^ https://appliancesc.com%{REQUEST_URI} [R=301,L]
   RewriteRule ^(?:wp-admin|wp-content|wp-includes)(?:/|$) - [R=404,L]
   RewriteRule ^wp-(?:activate|blog-header|comments-post|config|cron|links-opml|load|login|mail|settings|signup|trackback)\.php$ - [R=404,L]
   RewriteRule ^(?:index|xmlrpc)\.php$ - [R=404,L]
