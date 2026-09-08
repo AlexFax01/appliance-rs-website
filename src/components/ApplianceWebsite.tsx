@@ -213,9 +213,9 @@ export function ApplianceWebsite() {
         <div className="footer-meta">
           <div className="footer-links"><Link href="/privacy">Privacy</Link><span>Fully Insured</span><span>Pay After Repair</span><span>Clear Pricing</span></div>
           <a className="footer-credit" href="https://progressorai.ca/" rel="noreferrer" target="_blank">
-            <Image alt="ProgressorAI Canada" height={24} src="/images/brand/progressorai-canada.png" width={25} />
-            <span><small>Website crafted by</small><strong>ProgressorAI Canada</strong></span>
-            <IconArrowRight aria-hidden="true" size={16} />
+            <Image alt="" aria-hidden="true" height={12} src="/images/brand/progressorai-canada.png" style={{ height: "auto" }} width={13} />
+            <span>Website crafted by <strong>ProgressorAI</strong></span>
+            <IconArrowRight aria-hidden="true" size={12} />
           </a>
         </div>
       </footer>
