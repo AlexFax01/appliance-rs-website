@@ -1,11 +1,9 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { IconMapPin, IconArrowRight, IconBrandGoogle, IconMap2, IconRoute } from "@tabler/icons-react";
+import { IconMapPin, IconArrowRight, IconBrandGoogle, IconMap2 } from "@tabler/icons-react";
 import { checkCoverage, coverageSource, townZips } from "@/content/coverage";
 import { business, serviceAreas } from "@/content/site";
 
-const cityRouteUrl = (name: string) =>
-  `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${name}, SC`)}`;
 const pulseMarkers = [
   {name: "Travelers Rest", position: "travelers-rest"},
   {name: "Greenville", position: "greenville"},
@@ -81,13 +79,12 @@ export function CoverageChecker({onZip}: {onZip: (zip: string) => void}) {
           {pulseMarkers.map(marker => <button aria-label={`Show ${marker.name} service details`} className={`pulse-marker pulse-marker-${marker.position}${selectedTown === marker.name ? " is-selected" : ""}`} key={marker.name} onClick={() => selectTown(marker.name)} type="button"><IconMapPin /><span>{marker.name}</span></button>)}
           <aside aria-live="polite" className="pulse-city-card">
             <div><span>Selected service city</span><strong>{selectedTown}, SC</strong><small>ZIP zone: {selectedZips.join(", ") || "Confirm when scheduling"}</small></div>
-            <a href={cityRouteUrl(selectedTown)} rel="noreferrer" target="_blank"><IconRoute size={17} /> Get directions</a>
           </aside>
         </div> : null}
         {googleReady ? <button className="pulse-mode-button" onClick={() => setMapInteractive(value => !value)} type="button"><IconMap2 size={17} />{mapInteractive ? "Show service pulse" : "Explore Google map"}</button> : null}
       </div>
       <div className="service-city-directory">
-        <div className="service-city-heading"><IconMapPin size={20} /><div><strong>All 19 listed service towns</strong><span>Select a town to see its ZIP zone and route.</span></div></div>
+        <div className="service-city-heading"><IconMapPin size={20} /><div><strong>All 19 listed service towns</strong><span>Select a town to see its covered ZIP zone.</span></div></div>
         <div className="service-city-links">
           {serviceAreas.map(city => <button aria-pressed={selectedTown === city.name} className={city.primary ? "service-city-link service-city-primary" : "service-city-link"} key={city.name} onClick={() => selectTown(city.name)} type="button"><IconMapPin size={14} />{city.name}</button>)}
         </div>

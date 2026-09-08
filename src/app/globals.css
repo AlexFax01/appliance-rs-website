@@ -167,12 +167,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .pulse-marker-greer { --marker-x: 47%; --marker-y: 38%; }
 .pulse-marker-simpsonville { --marker-x: 44%; --marker-y: 57%; }
 .pulse-marker-spartanburg { --marker-x: 76%; --marker-y: 46%; }
-.pulse-city-card { align-items: center; background: rgba(255,255,255,.96); border: 1px solid rgba(170,192,220,.9); border-radius: 13px; bottom: 15px; box-shadow: 0 8px 24px rgba(3,27,67,.24); display: flex; gap: 14px; justify-content: space-between; left: 15px; max-width: calc(100% - 30px); padding: 12px 14px; pointer-events: auto; position: absolute; width: 390px; }
+.pulse-city-card { align-items: center; background: rgba(255,255,255,.96); border: 1px solid rgba(170,192,220,.9); border-radius: 13px; bottom: 15px; box-shadow: 0 8px 24px rgba(3,27,67,.24); display: flex; gap: 14px; left: 15px; max-width: calc(100% - 30px); padding: 12px 14px; pointer-events: auto; position: absolute; width: 330px; }
 .pulse-city-card > div { display: grid; gap: 2px; min-width: 0; }
 .pulse-city-card span { color: var(--blue); font-size: .57rem; font-weight: 850; letter-spacing: .11em; text-transform: uppercase; }
 .pulse-city-card strong { color: var(--deep); font-family: var(--font-heading); font-size: 1rem; }
 .pulse-city-card small { color: var(--muted); font-size: .61rem; line-height: 1.35; overflow-wrap: anywhere; }
-.pulse-city-card a { align-items: center; background: var(--orange); border-radius: 8px; box-shadow: 0 3px 0 #7f2e00; color: #fff; display: flex; flex: 0 0 auto; font-size: .68rem; font-weight: 850; gap: 5px; min-height: 36px; padding: 8px 10px; text-decoration: none; }
 .pulse-mode-button { align-items: center; background: rgba(255,255,255,.96); border: 1px solid #bfcee0; border-radius: 9px; box-shadow: 0 4px 12px rgba(3,27,67,.16); color: var(--navy); cursor: pointer; display: flex; font-size: .68rem; font-weight: 850; gap: 6px; min-height: 38px; padding: 8px 10px; position: absolute; right: 12px; top: 12px; z-index: 4; }
 @keyframes pulseRing { 0% { opacity: .8; transform: scale(.88); } 70%, 100% { opacity: 0; transform: scale(1.12); } }
 .google-map-placeholder { align-items: center; background: #f7f9fc; color: var(--muted); display: flex; flex: 1; flex-direction: column; font-size: .78rem; gap: 12px; justify-content: center; min-height: 325px; padding: 25px; text-align: center; }
@@ -435,7 +434,6 @@ dialog::backdrop { background: rgba(1,12,30,.76); backdrop-filter: blur(3px); }
   .pulse-marker { font-size: 0; min-height: 40px; padding: 7px; }
   .pulse-marker svg { height: 24px; width: 24px; }
   .pulse-city-card { align-items: stretch; display: grid; gap: 8px; width: 270px; }
-  .pulse-city-card a { justify-content: center; }
   .service-city-directory { padding: 18px 14px; }
   .service-city-links { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .reviews-top { display: grid; }
