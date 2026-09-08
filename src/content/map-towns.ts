@@ -26,3 +26,19 @@ export const mapTowns = serviceAreas.map(town => ({
   zips: Object.entries(zipTowns).filter(([, name]) => name === town.name).map(([zip]) => zip),
 }));
 export type MapTown = (typeof mapTowns)[number];
+
+// A single, deliberately approximate visual envelope around the published towns.
+// It is not presented as an exact boundary: the ZIP checker and scheduling remain authoritative.
+export const serviceAreaOutline = [
+  coordinates["Travelers Rest"],
+  coordinates.Landrum,
+  coordinates.Campobello,
+  coordinates.Chesnee,
+  coordinates.Drayton,
+  coordinates.Spartanburg,
+  coordinates.Roebuck,
+  coordinates.Moore,
+  coordinates.Reidville,
+  coordinates.Simpsonville,
+  coordinates.Greenville,
+].map(([lat, lng]) => ({ lat, lng }));

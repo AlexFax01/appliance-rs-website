@@ -15,6 +15,7 @@
     getMapCapabilities() { return { isAdvancedMarkersAvailable: true }; }
     fitBounds() { state.fits++; }
     panTo(position) { state.pans++; state.position = position; }
+    setZoom(zoom) { this.zoom = zoom; }
   }
   class AdvancedMarkerElement {
     constructor(options) {
@@ -27,11 +28,17 @@
       button.append(options.content); options.map.element.append(button);
       state.markers.push(this);
     }
+    addEventListener(type, fn) { this.button.addEventListener(type === 'gmp-click' ? 'click' : type, fn); }
+    removeEventListener(type, fn) { this.button.removeEventListener(type === 'gmp-click' ? 'click' : type, fn); }
     addListener(type, fn) { this.button.addEventListener(type, fn); return { remove: () => this.button.removeEventListener(type, fn) }; }
+  }
+  class Polygon {
+    constructor(options) { this.options = options; this.map = options.map; state.polygon = this; }
+    setMap(map) { this.map = map; }
   }
   Object.assign(window.google.maps, {
     Map, marker: { AdvancedMarkerElement },
-    LatLngBounds: class { extend() {} },
+    LatLngBounds: class { extend() {} }, Polygon,
     event: {
       addListenerOnce(map, name, fn) { const timer = setTimeout(fn, 50); return { remove: () => clearTimeout(timer) }; },
       clearInstanceListeners() {},

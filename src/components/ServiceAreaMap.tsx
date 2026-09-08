@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { IconFocus2, IconMapPin, IconPhone, IconArrowRight } from "@tabler/icons-react";
+import { IconFocus2, IconMapPin, IconPhone, IconArrowRight, IconArrowsMaximize, IconX } from "@tabler/icons-react";
 import { business } from "@/content/site";
 import type { MapTown } from "@/content/map-towns";
 import type { ServiceMapController } from "@/lib/service-map";
@@ -15,14 +15,32 @@ export function ServiceAreaMap({ selectedTown, onRequest }: {
   onRequest: (town: MapTown) => void;
 }) {
   const container = useRef<HTMLDivElement>(null);
+  const restoreFocus = useRef<HTMLButtonElement | null>(null);
+  const closeButton = useRef<HTMLButtonElement>(null);
   const controller = useRef<ServiceMapController | null>(null);
   const latestTown = useRef(selectedTown);
   const [state, setState] = useState<"loading" | "ready" | "fallback">(configured ? "loading" : "fallback");
   const [selected, setSelected] = useState<MapTown | null>(null);
+  const [expanded, setExpanded] = useState(false);
   useEffect(() => {
     latestTown.current = selectedTown;
     controller.current?.select(selectedTown);
   }, [selectedTown]);
+  useEffect(() => {
+    if (!expanded) return;
+    const focusTarget = restoreFocus.current;
+    document.body.classList.add("map-open");
+    closeButton.current?.focus();
+    const close = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setExpanded(false);
+    };
+    window.addEventListener("keydown", close);
+    return () => {
+      document.body.classList.remove("map-open");
+      window.removeEventListener("keydown", close);
+      focusTarget?.focus();
+    };
+  }, [expanded]);
   useEffect(() => {
     if (!configured || !container.current) return;
     const element = container.current;
@@ -63,29 +81,34 @@ export function ServiceAreaMap({ selectedTown, onRequest }: {
     };
   }, []);
 
-  return <div className={`town-map ${state === "fallback" ? "town-map-fallback" : ""}`}>
+  return <div className={`town-map ${state === "fallback" ? "town-map-fallback" : ""}${expanded ? " is-expanded" : ""}`} role={expanded ? "dialog" : undefined} aria-modal={expanded || undefined} aria-label={expanded ? "Expanded Appliance RS service area map" : undefined}>
     {state !== "fallback" && <div className="town-map-toolbar">
-      <div className="town-map-legend"><span><i className="legend-primary" />Main cities</span><span><i />Service towns</span></div>
-      <button type="button" disabled={state !== "ready"} onClick={() => controller.current?.reset()}><IconFocus2 size={18} />Show all</button>
+      <div className="town-map-legend"><span><i className="legend-primary" />Main cities</span><span><i />Service towns</span><span className="legend-area"><i />Approx. service area</span></div>
+      <div className="town-map-tools">
+        <button type="button" disabled={state !== "ready"} onClick={() => controller.current?.reset()}><IconFocus2 size={18} />Show all</button>
+        {!expanded && <button className="town-map-expand" type="button" disabled={state !== "ready"} aria-expanded="false" onClick={event => { restoreFocus.current = event.currentTarget; setExpanded(true); }}><IconArrowsMaximize size={18} />Expand map</button>}
+        {expanded && <button ref={closeButton} className="town-map-close" type="button" onClick={() => setExpanded(false)}><IconX size={19} />Close map</button>}
+      </div>
     </div>}
     <div className="classic-map-frame town-map-frame">
       {state === "fallback" ? <iframe allowFullScreen loading="lazy" referrerPolicy="strict-origin-when-cross-origin" src={business.mapEmbed} title="Appliance RS service area on Google Maps" /> : <>
         <div ref={container} className="town-map-canvas" aria-label="Appliance RS service towns on Google Maps" />
         {state === "loading" && <div className="town-map-loading" role="status"><IconMapPin size={28} /><span>Loading your local service area…</span></div>}
       </>}
-    </div>
-    {state !== "fallback" && <div className="town-map-details" aria-live="polite" aria-atomic="true">
-      <div className="town-map-detail-copy">
-        <span className="town-map-kicker">{selected ? "Local appliance repair" : "Service, close to home"}</span>
-        <h4>{selected ? `${selected.name}, SC` : "Find your town on the map"}</h4>
-        <p>{selected ? "We serve this town. We’ll confirm your exact address when scheduling." : "Tap a dot or use our ZIP checker to explore local service."}</p>
-        {selected && <small>ZIP codes: {selected.zips.join(", ")}</small>}
-      </div>
-      {selected && <div className="town-map-actions">
-        <button className="button-3d button-primary" type="button" onClick={() => onRequest(selected)}>Request repair <IconArrowRight size={16} /></button>
-        <a className="town-map-call" href={`tel:${business.phoneHref}`}><IconPhone size={17} />Call {business.phoneDisplay}</a>
+      {state !== "fallback" && !selected && <div className="town-map-hint"><IconMapPin size={17} /><span>Tap a branded pin to view local service.</span></div>}
+      {state !== "fallback" && selected && <div className="town-map-details" aria-live="polite" aria-atomic="true">
+        <div className="town-map-detail-copy">
+          <span className="town-map-kicker">Local appliance repair</span>
+          <h4>{selected.name}, SC</h4>
+          <p>We serve this town. We’ll confirm your exact address when scheduling.</p>
+          <small>ZIP codes: {selected.zips.join(", ")}</small>
+        </div>
+        <div className="town-map-actions">
+          <button className="button-3d button-primary" type="button" onClick={() => onRequest(selected)}>Request repair <IconArrowRight size={16} /></button>
+          <a className="town-map-call" href={`tel:${business.phoneHref}`}><IconPhone size={17} />Call {business.phoneDisplay}</a>
+        </div>
       </div>}
-    </div>}
+    </div>
     {state === "fallback" && configured && <p className="town-map-fallback-note">Use our ZIP checker to confirm your service town.</p>}
   </div>;
 }

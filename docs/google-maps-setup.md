@@ -9,13 +9,13 @@ NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID=
 
 Use a client-owned Google Cloud project with billing and Maps JavaScript API enabled. Create a dedicated browser API key restricted to Maps JavaScript API and HTTP referrers for the actual website (currently `https://appliance-rs-website.vercel.app/*`). Add client domains only when moving hosting. Use a separate restricted development key for `http://localhost:3100/*` and `http://127.0.0.1:3100/*`. Browser keys are public by design; referrer and API restrictions are essential. Never use an unrestricted server key.
 
-Create a JavaScript Map ID. Optionally attach a light cloud map style: pale blue water, muted parks, uncluttered roads, business POIs hidden, locality labels retained. Do not use a demonstration Map ID in production. The site's HTML markers provide orange regional centers, blue towns, hover/focus labels and selection halos regardless of the optional base-map style.
+Create a JavaScript Map ID. The demo Map ID uses the published `Appliance RS Light` cloud style: pale blue water, muted land, blue highway accents, hidden business POIs and retained locality labels. Do not reuse a demonstration Map ID for a different client. The site's branded image markers provide orange regional centers, blue towns, hover/focus labels and selection halos independently of the base-map style.
 
 Set both variables on Vercel and rebuild. For PHP hosting set them before `npm run build:client-host`; the static output contains the public browser configuration. No database or server-side Maps service is required.
 
 ## Loading and billing
 
-Only import the Google runtime as the map approaches the viewport (200px). Create one map per component mount. Selecting towns, checking ZIP, resetting the viewport and resizing reuse it. Do not request Places, geocoding, routing, 3D, or Street View. All 19 coordinates and ZIP associations are stored locally.
+Only import the Google runtime as the map approaches the viewport (200px). Create one map per component mount. Selecting towns, checking ZIP, resetting the viewport, resizing and the full-screen mobile view reuse it. Do not request Places, geocoding, routing, 3D, or Street View. All 19 coordinates, ZIP associations and the approximate service-area outline are stored locally.
 
 Dynamic Maps has 10,000 free monthly map loads per billing account/SKU under the current pay-as-you-go pricing. Page views, unique visitors and successful map loads are different metrics. A reload can cause a new chargeable map load. Other projects on the billing account can consume the same free allowance.
 
