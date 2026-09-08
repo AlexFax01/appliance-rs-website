@@ -9,6 +9,10 @@ No database, Supabase, CRM, or automation service is required.
 
 Current noindex client demo: <https://appliance-rs-website.vercel.app>
 
+## Site delivery
+
+Built and maintained by [ProgressorAI](https://progressorai.ca/).
+
 ## Local development
 
 ```bash
