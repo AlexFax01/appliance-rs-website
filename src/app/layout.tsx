@@ -17,6 +17,7 @@ export const metadata: Metadata = {
   description:
     "Fast, trusted appliance repair across Upstate South Carolina. Call, text, or request a callback from Appliance RS.",
   alternates: { canonical: "/" },
+  icons: { icon: "/images/brand/appliance-rs-logo.webp" },
   robots:
     siteStage === "production"
       ? { index: true, follow: true }
