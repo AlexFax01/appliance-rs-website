@@ -3,6 +3,7 @@ import { useState } from "react";
 import { IconMapPin, IconArrowRight, IconBrandGoogle } from "@tabler/icons-react";
 import { checkCoverage, coverageSource } from "@/content/coverage";
 import { business } from "@/content/site";
+import { ServiceAreaMap } from "./ServiceAreaMap";
 
 export function CoverageChecker({onZip}: {onZip: (zip: string) => void}) {
   const [zip, setZip] = useState("");
@@ -32,9 +33,12 @@ export function CoverageChecker({onZip}: {onZip: (zip: string) => void}) {
     </div>
     <div className="google-service-map">
       <div className="map-pane-heading"><IconBrandGoogle size={18} /><strong>Google service map</strong><span>Upstate South Carolina</span></div>
-      <div className="classic-map-frame">
-        <iframe allowFullScreen loading="lazy" referrerPolicy="strict-origin-when-cross-origin" src={business.mapEmbed} title="Appliance RS service area on Google Maps" />
-      </div>
+      <ServiceAreaMap selectedTown={result?.status === "listed" ? result.town ?? null : null} onRequest={town => {
+        const requestZip = result?.status === "listed" && result.town === town.name ? result.zip : town.zips[0];
+        setZip(requestZip); evaluate(requestZip);
+        document.getElementById("contact")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+        document.querySelector<HTMLInputElement>('#contact [name="name"]')?.focus({ preventScroll: true });
+      }} />
     </div>
     <a className="map-link" href={business.googleProfile} rel="noreferrer" target="_blank"><IconBrandGoogle /> Open Appliance RS on Google <IconArrowRight /></a>
   </div>;

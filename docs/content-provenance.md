@@ -6,6 +6,10 @@ Source: https://appliancesc.com/ (phone 864-924-4349). Google knowledge ID `/g/1
 
 The source offers a flat $85 service call, waived diagnostics with approved repair, a quote before work, and payment after work. No guarantee period or final repair estimate has been invented. Shared wording lives in `src/content/site.ts`.
 
+## Interactive map positions
+
+`src/content/map-towns.ts` uses internal reference points from the [2025 Census South Carolina Gazetteer](https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2025_Gazetteer/2025_gaz_place_45.txt), checked September 7, 2026. Moore, which has no Census place entry, uses its GeoNames 29369 postal reference point (34.8646, -82.0215), CC BY 4.0. These are town reference locations, not technician positions, store addresses or surveyed service boundaries. No live geocoding requests are made. All 19 towns match the existing published list. Standard embed remains the fallback until API configuration is provided.
+
 ## ZIP lookup
 
 GeoNames US postal dataset: https://download.geonames.org/export/zip/US.zip — retrieved 2026-09-05, CC BY 4.0, https://www.geonames.org/export/. Exact South Carolina postal-place matches for the 19 existing site towns were retained, including PO-box ZIPs. These are postal matches, not service boundaries. Unknown ZIPs remain eligible to request service; all addresses require scheduling confirmation.
