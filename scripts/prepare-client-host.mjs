@@ -8,4 +8,5 @@ const destination = resolve(projectRoot, "out/api");
 await mkdir(destination, { recursive: true });
 await cp(source, destination, { recursive: true });
 await cp(resolve(projectRoot, "src/content/problems.json"), resolve(destination, "problems.json"));
+await cp(resolve(projectRoot, "hosting/root.htaccess"), resolve(projectRoot, "out/.htaccess"));
 process.stdout.write("Client-host package prepared in out/ (static site + api/contact.php).\n");
