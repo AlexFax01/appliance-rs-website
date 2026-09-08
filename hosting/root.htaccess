@@ -6,7 +6,7 @@ ErrorDocument 404 /404.html
   RewriteEngine On
   RewriteRule ^(?:wp-admin|wp-content|wp-includes)(?:/|$) - [R=404,L]
   RewriteRule ^wp-(?:activate|blog-header|comments-post|config|cron|links-opml|load|login|mail|settings|signup|trackback)\.php$ - [R=404,L]
-  RewriteRule ^xmlrpc\.php$ - [R=404,L]
+  RewriteRule ^(?:index|xmlrpc)\.php$ - [R=404,L]
 </IfModule>
 
 <IfModule mod_headers.c>
