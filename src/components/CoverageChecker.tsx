@@ -1,13 +1,12 @@
 "use client";
 import { useState } from "react";
-import { IconMapPin, IconArrowRight, IconBrandGoogle, IconMap2 } from "@tabler/icons-react";
+import { IconMapPin, IconArrowRight, IconBrandGoogle } from "@tabler/icons-react";
 import { checkCoverage, coverageSource } from "@/content/coverage";
 import { business } from "@/content/site";
 
 export function CoverageChecker({onZip}: {onZip: (zip: string) => void}) {
   const [zip, setZip] = useState("");
   const [result, setResult] = useState<ReturnType<typeof checkCoverage> | null>(null);
-  const [mapOpen, setMapOpen] = useState(false);
   const evaluate = (value: string, showInvalid = true) => {
     const answer = checkCoverage(value);
     if (answer.status === "invalid" && !showInvalid) {
@@ -32,18 +31,9 @@ export function CoverageChecker({onZip}: {onZip: (zip: string) => void}) {
       <small className="coverage-source">Postal data: <a href={coverageSource.url} target="_blank" rel="noreferrer">GeoNames</a> · Checked September 5, 2026</small>
     </div>
     <div className="google-service-map">
-      <div className="map-pane-heading"><IconBrandGoogle size={18} /><strong>Service area</strong><span>Upstate South Carolina</span></div>
-      <div className={`service-pulse${mapOpen ? " is-interactive" : ""}`}>
-        {mapOpen ? <>
-          <iframe allowFullScreen loading="lazy" referrerPolicy="strict-origin-when-cross-origin" src={business.mapEmbed} title="Appliance RS service area on Google Maps" />
-          <button className="pulse-mode-button" onClick={() => setMapOpen(false)} type="button"><IconMap2 size={17} />Back to overview</button>
-        </> : <div className="service-map-preview">
-          <div aria-hidden="true" className="service-map-art">
-            <span className="map-road map-road-one" /><span className="map-road map-road-two" /><span className="map-road map-road-three" />
-            <span className="pulse-zone pulse-zone-west" /><span className="pulse-zone pulse-zone-center" /><span className="pulse-zone pulse-zone-east" />
-          </div>
-          <div className="service-map-preview-copy"><span>Approximate coverage</span><strong>Serving Upstate South Carolina</strong><p>Open the live map only when you need it.</p><button className="button-3d button-primary" type="button" onClick={() => setMapOpen(true)}><IconMap2 size={19} /> View service area</button></div>
-        </div>}
+      <div className="map-pane-heading"><IconBrandGoogle size={18} /><strong>Google service map</strong><span>Upstate South Carolina</span></div>
+      <div className="classic-map-frame">
+        <iframe allowFullScreen loading="lazy" referrerPolicy="strict-origin-when-cross-origin" src={business.mapEmbed} title="Appliance RS service area on Google Maps" />
       </div>
     </div>
     <a className="map-link" href={business.googleProfile} rel="noreferrer" target="_blank"><IconBrandGoogle /> Open Appliance RS on Google <IconArrowRight /></a>

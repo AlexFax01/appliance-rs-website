@@ -6,7 +6,7 @@ import {mkdir,writeFile} from 'node:fs/promises';
 const categories=['refrigerator-freezer','ice-maker','washer-dryer','dishwasher-disposal','oven-cooktop','microwave'];
 test('six appliance modals, keyboard focus, review tabs and no overflow',async({page},info)=>{
  await page.goto('/');
- await expect(page.locator('iframe')).toHaveCount(0);await expect(page.locator('.google-service-map')).toBeVisible();
+ await expect(page.locator('iframe')).toHaveCount(1);await expect(page.locator('.google-service-map')).toBeVisible();
  for(const value of categories){
   const card=page.locator(`[data-appliance="${value}"]`);await card.click();
   const dialog=page.getByRole('dialog');await expect(dialog).toBeVisible();
@@ -36,7 +36,7 @@ test('problem selections and ZIP transfer without erasing notes',async({page})=>
  await page.locator('.coverage-input input').fill('29601');
  await expect(page.locator('.coverage-result')).toContainText('Your ZIP is in our listed service area.');await expect(page.locator('[name=zipCode]')).toHaveValue('29601');
  await page.locator('.coverage-input input').fill('99999');await expect(page.locator('.coverage-result')).toContainText('Please contact us');await expect(page.locator('[name=zipCode]')).toHaveValue('99999');
- await expect(page.locator('iframe')).toHaveCount(0);await page.getByRole('button',{name:'View service area'}).click();await expect(page.locator('iframe')).toHaveAttribute('src',/12206806783937162522/);await expect(page.locator('iframe')).toHaveAttribute('loading','lazy');
+ await expect(page.locator('iframe')).toHaveAttribute('src',/12206806783937162522/);await expect(page.locator('iframe')).toHaveAttribute('loading','lazy');
 });
 test('photo preparation, limit and prepared SMS retention',async({page})=>{
  await page.goto('/');await page.locator('[name=name]').fill('Controlled QA');await page.locator('[name=phone]').fill('8645550123');await page.locator('[name=address]').fill('123 Main St, Greenville, SC');await page.locator('[name=zipCode]').fill('29601');await page.locator('[name=problem]').fill('Please preserve my test request.');await page.locator('[name=consent]').check();
@@ -69,8 +69,7 @@ test('mobile menu, persistent contact and lazy map are usable',async({page})=>{
  const menu=page.getByRole('button',{name:'Toggle navigation'});await menu.click();await expect(page.getByRole('navigation',{name:'Mobile navigation'})).toBeVisible();
  await page.getByRole('navigation',{name:'Mobile navigation'}).getByRole('link',{name:'Appliances We Repair'}).click();await expect(page).toHaveURL(/#appliances$/);await expect(page.getByRole('navigation',{name:'Mobile navigation'})).toHaveCount(0);await expect(page.locator('#appliances')).toBeInViewport();
  await menu.click();await page.getByRole('navigation',{name:'Mobile navigation'}).getByRole('link',{name:'Service Areas'}).click();await expect(page).toHaveURL(/#areas$/);await expect(page.getByRole('navigation',{name:'Mobile navigation'})).toHaveCount(0);await expect(page.locator('#areas')).toBeInViewport();
- await expect(page.locator('.google-service-map')).toBeVisible();await expect(page.locator('.service-city-link')).toHaveCount(0);await expect(page.locator('.pulse-marker')).toHaveCount(0);await expect(page.locator('iframe')).toHaveCount(0);
- await expect(page.locator('.service-map-preview')).toBeVisible();await page.getByRole('button',{name:'View service area'}).click();await expect(page.locator('iframe')).toBeVisible();await expect(page.getByRole('button',{name:'Back to overview'})).toBeVisible();await page.getByRole('button',{name:'Back to overview'}).click();await expect(page.locator('iframe')).toHaveCount(0);
+ await expect(page.locator('.google-service-map')).toBeVisible();await expect(page.locator('.service-city-link')).toHaveCount(0);await expect(page.locator('.pulse-marker')).toHaveCount(0);await expect(page.locator('.classic-map-frame iframe')).toBeVisible();
  await expect(page.locator('.mobile-contact-bar .mobile-call')).toHaveAttribute('href','tel:+18649244349');await expect(page.locator('.mobile-contact-bar')).not.toContainText('Text');await expect(page.locator('.mobile-contact-bar')).toContainText('Request callback');
  await page.evaluate(() => document.querySelector<HTMLButtonElement>('.header-cta')?.click());await expect(page.getByRole('dialog')).toBeVisible();await expect(page.getByRole('dialog').getByRole('link',{name:'Send a text'})).toHaveCount(0);await expect(page.getByRole('dialog').getByRole('button',{name:'Request a callback'})).toBeVisible();await page.getByRole('button',{name:'Close contact options'}).click();
  await page.locator('[data-appliance="refrigerator-freezer"]').click();const dialog=page.getByRole('dialog');await expect(dialog.getByRole('button',{name:'Request repair'})).toBeVisible();await expect(dialog.getByRole('link',{name:'Call now'})).toBeVisible();

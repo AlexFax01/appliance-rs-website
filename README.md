@@ -72,7 +72,7 @@ Google reviews are curated static excerpts with a verification date. They are no
 ## Seven improvements (September 2026)
 
 - Existing appliance icons open native dialogs with multiple problem choices and category-specific Google excerpts; selections transfer to the callback form without replacing free-text notes.
-- ZIP matching is advisory, not an availability promise. `src/content/coverage.ts` includes the source/license/date for all 19 towns. The map starts as a lightweight service-area illustration without duplicate town lists or custom location markers. The real Google iframe is created only after the visitor presses “View service area”, so it never contributes to the initial page load.
+- ZIP matching is advisory, not an availability promise. `src/content/coverage.ts` includes the source/license/date for all 19 towns. A classic interactive Google map is embedded with native lazy loading and presented in a framed card with an inset shadow. It has no custom location markers or duplicate town directory.
 - The form builds a complete SMS containing the visitor’s contact details, service address, appliance, chosen problems, description, ZIP, and preferred response time. It opens the phone’s messaging app addressed to 864-924-4349; the visitor reviews it and presses Send.
 - Up to three photos can be prepared and previewed locally. Because `sms:` links cannot pre-attach files, the form explicitly asks the visitor to attach them in Messages after it opens. The current browser flow does not upload those previews.
 - Service towns are ordered by 2020 Census population. Greenville, Spartanburg, Greer, and Simpsonville are emphasized as regional centers; Moore follows the ranked Census places because it has no directly comparable Census-place count.
