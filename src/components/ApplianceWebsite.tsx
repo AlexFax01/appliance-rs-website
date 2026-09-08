@@ -209,7 +209,15 @@ export function ApplianceWebsite() {
 
       <footer className="site-footer">
         <div className="footer-brand"><Image alt="Appliance RS logo" height={44} src="/images/brand/appliance-rs-logo.webp" width={44} /><span><strong>{business.name}</strong><small>{business.tagline}</small></span></div>
-        <p>© 2026 Appliance RS. All rights reserved.</p><div className="footer-links"><Link href="/privacy">Privacy</Link><span>Fully Insured</span><span>Pay After Repair</span><span>Clear Pricing</span></div>
+        <p>© 2026 Appliance RS. All rights reserved.</p>
+        <div className="footer-meta">
+          <div className="footer-links"><Link href="/privacy">Privacy</Link><span>Fully Insured</span><span>Pay After Repair</span><span>Clear Pricing</span></div>
+          <a className="footer-credit" href="https://progressorai.ca/" rel="noreferrer" target="_blank">
+            <Image alt="ProgressorAI Canada" height={24} src="/images/brand/progressorai-canada.png" width={25} />
+            <span><small>Website crafted by</small><strong>ProgressorAI Canada</strong></span>
+            <IconArrowRight aria-hidden="true" size={16} />
+          </a>
+        </div>
       </footer>
 
       <nav aria-label="Quick contact" className="mobile-contact-bar"><a className="mobile-call" href={`tel:${business.phoneHref}`}><IconPhone /> Call</a><button onClick={() => requestCallback()} type="button"><IconMessageCircle /> Request callback</button></nav>

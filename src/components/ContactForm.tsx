@@ -56,7 +56,6 @@ export function ContactForm({ selectedAppliance, onApplianceChange, selectedProb
     const payload = {
       name: String(form.get("name") ?? ""),
       phone: String(form.get("phone") ?? ""),
-      email: String(form.get("email") ?? ""),
       applianceType: String(form.get("applianceType") ?? "other"),
       problem: String(form.get("problem") ?? ""),
       selectedProblemIds,
@@ -98,7 +97,6 @@ export function ContactForm({ selectedAppliance, onApplianceChange, selectedProb
       "",
       `Name: ${parsed.data.name}`,
       `My callback number: ${parsed.data.phone}`,
-      parsed.data.email ? `Email: ${parsed.data.email}` : "",
       `Appliance: ${appliance}`,
       parsed.data.brand ? `Brand: ${parsed.data.brand}` : "",
       parsed.data.model ? `Model: ${parsed.data.model}` : "",
@@ -127,9 +125,6 @@ export function ContactForm({ selectedAppliance, onApplianceChange, selectedProb
         </Field>
         <Field label="Phone number" error={errors.phone}>
           <input aria-invalid={Boolean(errors.phone)} autoComplete="tel" inputMode="tel" name="phone" placeholder="(864) 555-0123" required />
-        </Field>
-        <Field label="Email (optional)" error={errors.email}>
-          <input aria-invalid={Boolean(errors.email)} autoComplete="email" inputMode="email" name="email" placeholder="jane@example.com" type="email" />
         </Field>
         <Field className="form-span" label="Service address" error={errors.address}>
           <input aria-invalid={Boolean(errors.address)} autoComplete="street-address" name="address" placeholder="123 Main St, Greenville, SC" maxLength={200} required />
@@ -173,7 +168,6 @@ export function ContactForm({ selectedAppliance, onApplianceChange, selectedProb
         <legend>How should we reply?</legend>
         <label><input defaultChecked name="preferredContact" type="radio" value="call" /> Call</label>
         <label><input name="preferredContact" type="radio" value="text" /> Text</label>
-        <label><input name="preferredContact" type="radio" value="email" /> Email</label>
       </fieldset>
 
       <label className="check-row"><input name="fallbackToText" type="checkbox" /> If I don’t answer, send me a text.</label>

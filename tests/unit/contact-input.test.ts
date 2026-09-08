@@ -8,7 +8,7 @@ import {checkCoverage, zipTowns} from "../../src/content/coverage";
 const sendMail = vi.hoisted(() => vi.fn());
 vi.mock("nodemailer", () => ({default: {createTransport: () => ({sendMail})}}));
 import handler from "../../api/contact";
-const valid = {name:"QA Test",phone:"8645550123",email:"",applianceType:"washer-dryer",problem:"",selectedProblemIds:["dryer-not-heating"],brand:"Brand QA",model:"TEST-123",address:"123 Main St, Greenville, SC",zipCode:"99999",preferredContact:"call",bestTime:"Anytime",consent:true,formStartedAt:1};
+const valid = {name:"QA Test",phone:"8645550123",applianceType:"washer-dryer",problem:"",selectedProblemIds:["dryer-not-heating"],brand:"Brand QA",model:"TEST-123",address:"123 Main St, Greenville, SC",zipCode:"99999",preferredContact:"call",bestTime:"Anytime",consent:true,formStartedAt:1};
 async function request(count = 0, type = "image/jpeg", bytes?: Uint8Array) {
   const form = new FormData(); form.set("payload",JSON.stringify(valid));
   const buffer = bytes ?? await sharp({create:{width:20,height:20,channels:3,background:"white"}}).jpeg().toBuffer();

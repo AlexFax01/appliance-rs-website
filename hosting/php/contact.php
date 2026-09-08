@@ -31,7 +31,6 @@ if (clean($raw['website'] ?? '', 100) !== '') respond(200, ['ok' => true, 'reque
 
 $name = clean($raw['name'] ?? '', 80);
 $phone = clean($raw['phone'] ?? '', 30);
-$email = clean($raw['email'] ?? '', 160);
 $appliance = clean($raw['applianceType'] ?? '', 40);
 $problem = clean($raw['problem'] ?? '', 1500);
 $brand = clean($raw['brand'] ?? '');
@@ -46,13 +45,11 @@ $bestTime = clean($raw['bestTime'] ?? '', 80);
 $consent = ($raw['consent'] ?? false) === true;
 $startedAt = (int)($raw['formStartedAt'] ?? 0);
 $appliances = ['refrigerator-freezer', 'ice-maker', 'washer-dryer', 'dishwasher-disposal', 'oven-cooktop', 'microwave', 'other'];
-$methods = ['call', 'text', 'email'];
+$methods = ['call', 'text'];
 
 $errors = [];
 if (mb_strlen($name) < 2 || mb_strlen($name) > 80) $errors['name'] = ['Please enter your name (2–80 characters).'];
 if (mb_strlen(preg_replace('/\D+/', '', $phone) ?? '') < 10 || mb_strlen($phone) > 30) $errors['phone'] = ['Please enter a valid phone number.'];
-if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) $errors['email'] = ['Please enter a valid email.'];
-if ($preferred === 'email' && $email === '') $errors['email'] = ['Email is required for email contact.'];
 if (!in_array($appliance, $appliances, true)) $errors['applianceType'] = ['Please choose an appliance.'];
 $allowed = array_column($catalog[$appliance] ?? [], 'id');
 if (!is_array($selected) || !array_is_list($selected) || count($selected) > 4 || count(array_filter($selected, 'is_string')) !== count($selected)) {
@@ -112,7 +109,7 @@ if (!is_file($autoload)) respond(502, ['ok' => false, 'code' => 'delivery_not_co
 require $autoload;
 
 $requestId = bin2hex(random_bytes(8));
-$body = "New Appliance RS callback request ({$requestId})\n\nName: {$name}\nPhone: {$phone}\nEmail: " . ($email ?: 'Not provided') . "\nAppliance: {$appliance}\nService address: {$address}\nZIP: {$zip}\nPreferred contact: {$preferred}\nBest time: {$bestTime}\nText fallback: " . (($raw['fallbackToText'] ?? false) ? 'Yes' : 'No') . "\n\nProblem:\n{$problem}";
+$body = "New Appliance RS callback request ({$requestId})\n\nName: {$name}\nPhone: {$phone}\nAppliance: {$appliance}\nService address: {$address}\nZIP: {$zip}\nPreferred contact: {$preferred}\nBest time: {$bestTime}\nText fallback: " . (($raw['fallbackToText'] ?? false) ? 'Yes' : 'No') . "\n\nProblem:\n{$problem}";
 $labels = array_column(array_filter($catalog[$appliance] ?? [], fn($item) => in_array($item['id'], $selected, true)), 'label');
 $body .= "\n\nBrand: " . ($brand ?: 'Not provided') . "\nModel: " . ($model ?: 'Not provided') . "\nSelected problems: " . (implode('; ', $labels) ?: 'None selected');
 
@@ -127,7 +124,6 @@ try {
     $mail->SMTPSecure = $mail->Port === 465 ? PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS : PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
     $mail->setFrom((string)getenv('CONTACT_FROM_EMAIL'), 'Appliance RS Website');
     $mail->addAddress((string)(getenv('CONTACT_TO_EMAIL') ?: 'appliansersl@gmail.com'));
-    if ($email !== '') $mail->addReplyTo($email, $name);
     $mail->Subject = "Appliance RS service request - {$appliance} - " . substr($requestId, 0, 8);
     $mail->Body = $body;
     $mail->CharSet = 'UTF-8';

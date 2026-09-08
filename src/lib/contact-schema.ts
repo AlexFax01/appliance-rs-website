@@ -5,12 +5,11 @@ export const applianceValues = [
   "refrigerator-freezer", "ice-maker", "washer-dryer", "dishwasher-disposal",
   "oven-cooktop", "microwave", "other",
 ] as const;
-export const contactMethods = ["call", "text", "email"] as const;
+export const contactMethods = ["call", "text"] as const;
 
 export const contactSchema = z.object({
   name: z.string().trim().min(2, "Please enter your name.").max(80),
   phone: z.string().trim().min(10, "Please enter a valid phone number.").max(30).refine(value => value.replace(/\D/g, "").length >= 10, "Please enter a valid phone number."),
-  email: z.union([z.literal(""), z.string().trim().email("Please enter a valid email.")]),
   applianceType: z.enum(applianceValues),
   problem: z.string().trim().max(1500).default(""),
   selectedProblemIds: z.array(z.string().max(80)).max(4).default([]),
@@ -33,9 +32,6 @@ export const contactSchema = z.object({
   }
   if (!data.selectedProblemIds.length && data.problem.length < 10) {
     ctx.addIssue({code: "custom", path: ["problem"], message: "Select a problem or briefly describe what’s happening."});
-  }
-  if (data.preferredContact === "email" && !data.email) {
-    ctx.addIssue({ code: "custom", path: ["email"], message: "Email is required when email is your preferred contact method." });
   }
 });
 

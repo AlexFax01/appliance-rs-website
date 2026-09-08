@@ -47,7 +47,6 @@ function textBody(payload: ContactPayload, requestId: string) {
     `New Appliance RS callback request (${requestId})`,
     `Name: ${payload.name}`,
     `Phone: ${payload.phone}`,
-    `Email: ${payload.email || "Not provided"}`,
     `Appliance: ${payload.applianceType}`,
     `Brand: ${payload.brand || "Not provided"}`,
     `Model: ${payload.model || "Not provided"}`,
@@ -68,7 +67,7 @@ function textBody(payload: ContactPayload, requestId: string) {
 function htmlBody(payload: ContactPayload, requestId: string) {
   const rows = [
     ["Request", requestId], ["Name", payload.name], ["Phone", payload.phone],
-    ["Email", payload.email || "Not provided"], ["Appliance", payload.applianceType],
+    ["Appliance", payload.applianceType],
     ["Brand", payload.brand || "Not provided"], ["Model", payload.model || "Not provided"],
     ["Selected problems", selectedProblems(payload)],
     ["Service address", payload.address],
@@ -116,7 +115,6 @@ async function handle(request: Request) {
     const delivery = await transport.sendMail({
       from: CONTACT_FROM_EMAIL,
       to: process.env.CONTACT_TO_EMAIL ?? "appliansersl@gmail.com",
-      replyTo: parsed.data.email || undefined,
       subject: `Appliance RS service request — ${parsed.data.applianceType} — ${requestId.slice(0, 8)}`,
       text: textBody(parsed.data, requestId),
       html: htmlBody(parsed.data, requestId),
