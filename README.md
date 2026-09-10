@@ -30,7 +30,7 @@ NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=client-owned-browser-key
 NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID=client-owned-map-id
 ```
 
-GA4 is installed only through GTM. The Maps key must be restricted to the production domains and Maps JavaScript API. Empty Maps values keep the click-to-load classic Google map fallback.
+GA4 is installed only through GTM. The Maps key must be restricted to the production domain and Maps JavaScript API. With production Maps values the branded map loads automatically as it approaches the viewport; empty or failed Maps configuration keeps the classic Google map fallback.
 
 ## Canonical pages
 

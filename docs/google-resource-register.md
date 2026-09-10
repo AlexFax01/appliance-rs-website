@@ -15,9 +15,9 @@ Agency access: named ProgressorAI account only; never a shared password.
 | GA4 property | Appliance RS Website | `appliancersl@gmail.com` | Pending GA4 account creation |
 | GA4 web stream | `https://appliancesc.com` | `appliancersl@gmail.com` | Pending GA4 account creation |
 | GTM web container | Appliance RS Website | `appliancersl@gmail.com` | Creation blocked on owner acceptance of Tag Manager terms |
-| Google Cloud project | Appliance RS Website | Client Google account | Blocked on owner acceptance of Cloud terms and billing |
-| Maps browser key | Production domain-restricted key | Client Google account | Not yet issued |
-| Maps Map ID | Production JavaScript Map ID | Client Google account | Not yet issued |
+| Google Cloud project | My First Project (`project-3bc5bc8b-4231-4ef3-b98`) | `appliancersl@gmail.com` | Active with client billing/free-trial account; Maps JavaScript API enabled September 10, 2026 |
+| Maps browser key | Appliance RS Website (`20550761-46d2-4c96-8350-0d7d92c4ea42`) | `appliancersl@gmail.com` | Active; restricted to `https://appliancesc.com/*` and Maps JavaScript API |
+| Maps Map ID | `c153fc6441a7350678380d17` | `appliancersl@gmail.com` | Active production JavaScript vector map |
 | Local Services Ads | Appliance RS LLC | Client Google account | Identity / representative verification is owner-only |
 
 ## Verified profile facts (2026-09-10)
@@ -33,7 +33,7 @@ Agency access: named ProgressorAI account only; never a shared password.
 ## Recovery and role checklist
 
 - Owner enables Google two-step verification and stores recovery codes offline.
-- Owner accepts Cloud and Ads legal terms and adds payment details.
+- Owner keeps the Cloud billing profile active and accepts any future Ads legal terms that require owner action.
 - ProgressorAI receives Search Console Full user (or delegated owner), GA4 Editor, GTM Publish, Google Ads Standard, and only the Cloud Maps/API role required for configuration.
 - Billing Admin is not assigned to ProgressorAI unless the owner explicitly decides it is necessary.
 - DNS verification TXT records remain in DNS after Search Console verification.
