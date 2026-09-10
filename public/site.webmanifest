@@ -1,0 +1,12 @@
+{
+  "name": "Appliance RS",
+  "short_name": "Appliance RS",
+  "description": "Local appliance repair in Upstate South Carolina.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f8fc",
+  "theme_color": "#06316d",
+  "icons": [
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

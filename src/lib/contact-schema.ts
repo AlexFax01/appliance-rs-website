@@ -11,7 +11,7 @@ export const contactSchema = z.object({
   name: z.string().trim().min(2, "Please enter your name.").max(80),
   phone: z.string().trim().min(10, "Please enter a valid phone number.").max(30).refine(value => value.replace(/\D/g, "").length >= 10, "Please enter a valid phone number."),
   applianceType: z.enum(applianceValues),
-  problem: z.string().trim().max(1500).default(""),
+  problem: z.string().trim().max(600, "Please keep the additional details under 600 characters.").default(""),
   selectedProblemIds: z.array(z.string().max(80)).max(4).default([]),
   brand: z.string().trim().max(80).default(""),
   model: z.string().trim().max(100).default(""),

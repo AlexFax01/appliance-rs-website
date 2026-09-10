@@ -4,6 +4,7 @@ ErrorDocument 404 /404.html
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
+  RewriteCond %{HTTPS} !=on [OR]
   RewriteCond %{HTTP_HOST} ^www\.appliancesc\.com$ [NC]
   RewriteRule ^ https://appliancesc.com%{REQUEST_URI} [R=301,L]
   RewriteRule ^(?:wp-admin|wp-content|wp-includes)(?:/|$) - [R=404,L]
@@ -12,7 +13,9 @@ ErrorDocument 404 /404.html
 </IfModule>
 
 <IfModule mod_headers.c>
+  Header always set Strict-Transport-Security "max-age=31536000"
   Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
   Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
   <FilesMatch "\.(?:css|js|woff2|avif|webp|png|jpe?g|svg|ico)$">

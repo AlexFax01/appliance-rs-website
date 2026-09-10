@@ -1,10 +1,13 @@
 import {test,expect} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 const categories=['refrigerator-freezer','ice-maker','washer-dryer','dishwasher-disposal','oven-cooktop','microwave'];
+test.beforeEach(async({page},testInfo)=>{
+ if(!testInfo.title.includes('canonical service pages')) await page.addInitScript(()=>localStorage.setItem('appliance-rs-consent-v1',JSON.stringify({analytics:false,advertising:false})));
+});
 test('six appliance modals, keyboard focus, review tabs and no overflow',async({page},info)=>{
  await page.goto('/');
  await expect(page.locator('.google-service-map')).toBeVisible();
- expect(await page.locator('.classic-map-frame iframe, .town-map-canvas').count()).toBe(1);
+ await expect(page.locator('.classic-map-frame iframe, .town-map-canvas')).toHaveCount(0);
  for(const value of categories){
   const card=page.locator(`[data-appliance="${value}"]`);await card.click();
   const dialog=page.getByRole('dialog');await expect(dialog).toBeVisible();
@@ -34,15 +37,15 @@ test('problem selections and ZIP transfer without erasing notes',async({page})=>
  await page.locator('.coverage-input input').fill('29601');
  await expect(page.locator('.coverage-result')).toContainText('Your ZIP is in our listed service area.');await expect(page.locator('[name=zipCode]')).toHaveValue('29601');
  await page.locator('.coverage-input input').fill('99999');await expect(page.locator('.coverage-result')).toContainText('Please contact us');await expect(page.locator('[name=zipCode]')).toHaveValue('99999');
- const fallbackMap=page.locator('.classic-map-frame iframe[src]');
- if(await fallbackMap.count()) { await expect(fallbackMap).toHaveAttribute('src',/12206806783937162522/);await expect(fallbackMap).toHaveAttribute('loading','lazy'); }
- else await expect(page.locator('.town-map-canvas')).toHaveCount(1);
+ await expect(page.locator('.classic-map-frame iframe, .town-map-canvas')).toHaveCount(0);
 });
 test('prepared SMS retains the complete service request',async({page})=>{
  await page.goto('/');await page.locator('[name=name]').fill('Controlled QA');await page.locator('[name=phone]').fill('8645550123');await page.locator('[name=address]').fill('123 Main St, Greenville, SC');await page.locator('[name=zipCode]').fill('29601');await page.locator('[name=problem]').fill('Please preserve my test request.');await page.locator('[name=consent]').check();
  await expect(page.locator('#repair-photos, .photo-upload')).toHaveCount(0);
- await page.getByRole('button',{name:'Review & open SMS'}).click();await expect(page.locator('.form-notice')).toContainText('ready');await expect(page.locator('[name=problem]')).toHaveValue('Please preserve my test request.');
- const sms=await page.locator('#sms-ready-link').getAttribute('href');expect(sms).toMatch(/^sms:\+18649244349[?&]body=/);expect(decodeURIComponent(sms!)).toContain('Name: Controlled QA');expect(decodeURIComponent(sms!)).toContain('Service address: 123 Main St, Greenville, SC');expect(decodeURIComponent(sms!)).not.toContain('Photos:');
+ await page.getByRole('button',{name:'Review request'}).click();await expect(page.locator('.form-notice')).toContainText('ready');await expect(page.locator('[name=problem]')).toHaveValue('Please preserve my test request.');
+ const sms=await page.locator('#sms-ready-link').getAttribute('href');expect(sms).toMatch(/^sms:\+18644976563[?&]body=/);expect(decodeURIComponent(sms!)).toContain('Name: Controlled QA');expect(decodeURIComponent(sms!)).toContain('Service address: 123 Main St, Greenville, SC');expect(decodeURIComponent(sms!)).not.toContain('Photos:');
+ await expect(page.locator('.sms-review')).toContainText('Controlled QA');await expect(page.getByRole('button',{name:'Copy message'})).toBeVisible();
+ const analytics=await page.evaluate(()=>JSON.stringify(window.dataLayer));for(const privateValue of ['Controlled QA','8645550123','123 Main St','29601','Please preserve']) expect(analytics).not.toContain(privateValue);
 });
 test('pricing, reduced motion and accessibility',async({page})=>{
  await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/');await page.locator('.price-card').click();
@@ -54,11 +57,11 @@ test('selected-only request works without a written description',async({page})=>
  await page.goto('/');await page.locator('[data-appliance="washer-dryer"]').click();
  const dialog=page.getByRole('dialog');await dialog.locator('.problem-option').nth(1).click();await dialog.locator('.service-dialog-cta').click();
  await page.locator('[name=name]').fill('Controlled QA');await page.locator('[name=phone]').fill('8645550123');await page.locator('[name=address]').fill('456 Oak Ave, Greer, SC');await page.locator('[name=zipCode]').fill('99999');await page.locator('[name=consent]').check();
- await page.getByRole('button',{name:'Review & open SMS'}).click();await expect(page.locator('.form-notice')).toContainText('ready');const sms=decodeURIComponent((await page.locator('#sms-ready-link').getAttribute('href'))!);expect(sms).toContain('Common problems: Dryer not heating');
+ await page.getByRole('button',{name:'Review request'}).click();await expect(page.locator('.form-notice')).toContainText('ready');const sms=decodeURIComponent((await page.locator('#sms-ready-link').getAttribute('href'))!);expect(sms).toContain('Common problems: Dryer not heating');
 });
 
 test('invalid form moves focus and scrolls to the first field that needs attention',async({page})=>{
- await page.goto('/');await page.locator('#contact').scrollIntoViewIfNeeded();await page.getByRole('button',{name:'Review & open SMS'}).click();
+ await page.goto('/');await page.locator('#contact').scrollIntoViewIfNeeded();await page.getByRole('button',{name:'Review request'}).click();
  await expect(page.locator('[name=name]')).toBeFocused();await expect(page.locator('[name=name]')).toBeInViewport();await expect(page.locator('.form-notice')).toContainText('highlighted fields');
 });
 
@@ -72,10 +75,19 @@ test('mobile menu, persistent contact and lazy map are usable',async({page})=>{
  const menu=page.getByRole('button',{name:'Toggle navigation'});await menu.click();await expect(page.getByRole('navigation',{name:'Mobile navigation'})).toBeVisible();
  await page.getByRole('navigation',{name:'Mobile navigation'}).getByRole('link',{name:'Appliances We Repair'}).click();await expect(page).toHaveURL(/#appliances$/);await expect(page.getByRole('navigation',{name:'Mobile navigation'})).toHaveCount(0);await expect(page.locator('#appliances')).toBeInViewport();
  await menu.click();await page.getByRole('navigation',{name:'Mobile navigation'}).getByRole('link',{name:'Service Areas'}).click();await expect(page).toHaveURL(/#areas$/);await expect(page.getByRole('navigation',{name:'Mobile navigation'})).toHaveCount(0);await expect(page.locator('#areas')).toBeInViewport();
- await expect(page.locator('.google-service-map')).toBeVisible();await expect(page.locator('.service-city-link')).toHaveCount(0);await expect(page.locator('.pulse-marker')).toHaveCount(0);await expect(page.locator('.classic-map-frame iframe')).toBeVisible();
- await expect(page.locator('.mobile-contact-bar .mobile-call')).toHaveAttribute('href','tel:+18649244349');await expect(page.locator('.mobile-contact-bar')).not.toContainText('Text');await expect(page.locator('.mobile-contact-bar')).toContainText('Request callback');
- await page.evaluate(() => document.querySelector<HTMLButtonElement>('.header-cta')?.click());await expect(page.getByRole('dialog')).toBeVisible();await expect(page.getByRole('dialog').getByRole('link',{name:'Send a text'})).toHaveCount(0);await expect(page.getByRole('dialog').getByRole('button',{name:'Request a callback'})).toBeVisible();await page.getByRole('button',{name:'Close contact options'}).click();
+ await expect(page.locator('.google-service-map')).toBeVisible();await expect(page.locator('.service-city-link')).toHaveCount(0);await expect(page.locator('.pulse-marker')).toHaveCount(0);await expect(page.locator('.classic-map-frame iframe')).toHaveCount(0);
+ await page.getByRole('button',{name:'Open Google map'}).click();await expect(page.locator('.classic-map-frame iframe')).toBeVisible();
+ await expect(page.locator('.mobile-contact-bar .mobile-call')).toHaveAttribute('href','tel:+18649244349');await expect(page.locator('.mobile-contact-bar')).toContainText('Request by text');
+ await expect(page.locator('.header-cta')).toHaveAttribute('href','tel:+18649244349');
  await page.locator('[data-appliance="refrigerator-freezer"]').click();const dialog=page.getByRole('dialog');await expect(dialog.getByRole('button',{name:'Request repair'})).toBeVisible();await expect(dialog.getByRole('link',{name:'Call now'})).toBeVisible();
+});
+
+test('canonical service pages, sitemap metadata and consent controls are present',async({page})=>{
+ const paths=['/','/refrigerator-freezer-repair/','/ice-maker-repair/','/washer-dryer-repair/','/dishwasher-disposal-repair/','/oven-cooktop-repair/','/microwave-repair/','/service-areas/','/privacy/'];
+ for(const path of paths){const response=await page.goto(path);expect(response?.status()).toBe(200);await expect(page.locator('link[rel=canonical]')).toHaveAttribute('href',`https://appliancesc.com${path}`);await expect(page.locator('meta[name=robots]')).toHaveAttribute('content',/index, follow/);}
+ await page.goto('/');const structured=await page.locator('script[type="application/ld+json"]').first().textContent();expect(structured).toContain('Appliance RS LLC');expect(structured).toContain('Organization');expect(structured).not.toContain('AggregateRating');expect(structured).not.toContain('PostalAddress');
+ await expect(page.getByRole('dialog',{name:'Your privacy choices'})).toBeVisible();await page.getByRole('button',{name:'Reject'}).click();
+ await expect(page.getByRole('dialog',{name:'Your privacy choices'})).toHaveCount(0);await page.getByRole('button',{name:'Cookie settings'}).click();await expect(page.getByRole('dialog',{name:'Your privacy choices'})).toBeVisible();
 });
 
 test('service areas are ranked and visually tiered',async({page})=>{

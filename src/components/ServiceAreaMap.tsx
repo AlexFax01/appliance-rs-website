@@ -5,6 +5,7 @@ import { IconFocus2, IconMapPin, IconPhone, IconArrowRight, IconArrowsMaximize, 
 import { business } from "@/content/site";
 import type { MapTown } from "@/content/map-towns";
 import type { ServiceMapController } from "@/lib/service-map";
+import { trackEvent } from "@/lib/analytics";
 
 const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
 const mapId = process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID ?? "";
@@ -19,7 +20,8 @@ export function ServiceAreaMap({ selectedTown, onRequest }: {
   const closeButton = useRef<HTMLButtonElement>(null);
   const controller = useRef<ServiceMapController | null>(null);
   const latestTown = useRef(selectedTown);
-  const [state, setState] = useState<"loading" | "ready" | "fallback">(configured ? "loading" : "fallback");
+  const [state, setState] = useState<"idle" | "loading" | "ready" | "fallback">("idle");
+  const [activated, setActivated] = useState(false);
   const [selected, setSelected] = useState<MapTown | null>(null);
   const [expanded, setExpanded] = useState(false);
   useEffect(() => {
@@ -42,10 +44,11 @@ export function ServiceAreaMap({ selectedTown, onRequest }: {
     };
   }, [expanded]);
   useEffect(() => {
-    if (!configured || !container.current) return;
+    if (!activated) return;
+    if (!configured) return;
+    if (!container.current) return;
     const element = container.current;
     const abort = new AbortController();
-    let started = false;
     let timeout: ReturnType<typeof setTimeout> | undefined;
     const fallback = () => {
       if (abort.signal.aborted) return;
@@ -53,8 +56,6 @@ export function ServiceAreaMap({ selectedTown, onRequest }: {
       setState("fallback");
     };
     const start = async () => {
-      if (started || abort.signal.aborted) return;
-      started = true;
       timeout = setTimeout(fallback, 15000);
       try {
         const { createServiceMap } = await import("@/lib/service-map");
@@ -69,20 +70,17 @@ export function ServiceAreaMap({ selectedTown, onRequest }: {
         if (latestTown.current) instance?.select(latestTown.current);
       } catch { fallback(); }
     };
-    const observer = "IntersectionObserver" in window ? new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) { observer?.disconnect(); void start(); }
-    }, { rootMargin: "200px 0px" }) : null;
-    if (observer) observer.observe(element); else void start();
+    void start();
     window.addEventListener("service-map-auth-error", fallback);
     return () => {
-      abort.abort(); observer?.disconnect(); clearTimeout(timeout);
+      abort.abort(); clearTimeout(timeout);
       window.removeEventListener("service-map-auth-error", fallback);
       controller.current?.destroy(); controller.current = null;
     };
-  }, []);
+  }, [activated]);
 
   return <div className={`town-map ${state === "fallback" ? "town-map-fallback" : ""}${expanded ? " is-expanded" : ""}`} role={expanded ? "dialog" : undefined} aria-modal={expanded || undefined} aria-label={expanded ? "Expanded Appliance RS service area map" : undefined}>
-    {state !== "fallback" && <div className="town-map-toolbar">
+    {state !== "idle" && state !== "fallback" && <div className="town-map-toolbar">
       <div className="town-map-legend"><span><i className="legend-primary" />Main cities</span><span><i />Service towns</span><span className="legend-area"><i />Approx. service area</span></div>
       <div className="town-map-tools">
         <button type="button" disabled={state !== "ready"} onClick={() => controller.current?.reset()}><IconFocus2 size={18} />Show all</button>
@@ -91,12 +89,12 @@ export function ServiceAreaMap({ selectedTown, onRequest }: {
       </div>
     </div>}
     <div className="classic-map-frame town-map-frame">
-      {state === "fallback" ? <iframe allowFullScreen loading="lazy" referrerPolicy="strict-origin-when-cross-origin" src={business.mapEmbed} title="Appliance RS service area on Google Maps" /> : <>
+      {state === "idle" ? <div className="map-activation"><IconMapPin size={38} /><p className="eyebrow">Interactive Google map</p><h4>See where Appliance RS works</h4><p>Open the map to explore the listed service towns. The map stays unloaded until you choose to view it.</p><button className="button-3d button-primary" onClick={() => { if (configured) { setState("loading"); setActivated(true); } else setState("fallback"); trackEvent("map_open", { map_type: configured ? "javascript" : "embed" }); }} type="button">Open Google map <IconArrowRight size={17} /></button></div> : state === "fallback" ? <iframe allowFullScreen loading="lazy" referrerPolicy="strict-origin-when-cross-origin" src={business.mapEmbed} title="Appliance RS service area on Google Maps" /> : <>
         <div ref={container} className="town-map-canvas" aria-label="Appliance RS service towns on Google Maps" />
         {state === "loading" && <div className="town-map-loading" role="status"><IconMapPin size={28} /><span>Loading your local service area…</span></div>}
       </>}
-      {state !== "fallback" && !selected && <div className="town-map-hint"><IconMapPin size={17} /><span>Tap a branded pin to view local service.</span></div>}
-      {state !== "fallback" && selected && <div className="town-map-details" aria-live="polite" aria-atomic="true">
+      {state !== "idle" && state !== "fallback" && !selected && <div className="town-map-hint"><IconMapPin size={17} /><span>Tap a branded pin to view local service.</span></div>}
+      {state !== "idle" && state !== "fallback" && selected && <div className="town-map-details" aria-live="polite" aria-atomic="true">
         <div className="town-map-detail-copy">
           <span className="town-map-kicker">Local appliance repair</span>
           <h4>{selected.name}, SC</h4>
@@ -105,10 +103,10 @@ export function ServiceAreaMap({ selectedTown, onRequest }: {
         </div>
         <div className="town-map-actions">
           <button className="button-3d button-primary" type="button" onClick={() => onRequest(selected)}>Request repair <IconArrowRight size={16} /></button>
-          <a className="town-map-call" href={`tel:${business.phoneHref}`}><IconPhone size={17} />Call {business.phoneDisplay}</a>
+          <a className="town-map-call" data-analytics-event="call_click" data-analytics-location="map" href={`tel:${business.callPhone.e164}`}><IconPhone size={17} />Call {business.callPhone.display}</a>
         </div>
       </div>}
     </div>
-    {state === "fallback" && configured && <p className="town-map-fallback-note">Use our ZIP checker to confirm your service town.</p>}
+    {state === "fallback" && configured && <p className="town-map-fallback-note">The interactive map is unavailable. Use our ZIP checker or the classic Google map to confirm your service town.</p>}
   </div>;
 }

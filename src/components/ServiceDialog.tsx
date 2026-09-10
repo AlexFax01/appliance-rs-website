@@ -46,8 +46,9 @@ export function ServiceDialog({ service, selectedProblemIds, onProblemsChange, o
     <div className="service-dialog-footer">
       <span aria-live="polite">{selectedProblemIds.length ? `${selectedProblemIds.length} problem${selectedProblemIds.length === 1 ? "" : "s"} selected` : "Tell us what needs attention"}</span>
       <div className="service-dialog-actions">
-        <button className="button-3d button-primary service-dialog-cta" onClick={() => { onClose(); onRequest(service.value); }} type="button">Request repair <IconArrowRight /></button>
-        <a className="button-3d button-orange service-dialog-call" href={`tel:${business.phoneHref}`}><IconPhone size={19} /> Call now</a>
+        <a className="service-learn-link" href={`/${service.slug}/`}>Learn more</a>
+        <button className="button-3d button-primary service-dialog-cta" data-analytics-event="request_repair_click" data-analytics-location="service_dialog" data-analytics-appliance={service.value} onClick={() => { onClose(); onRequest(service.value); }} type="button">Request repair <IconArrowRight /></button>
+        <a className="button-3d button-orange service-dialog-call" data-analytics-event="call_click" data-analytics-location="service_dialog" data-analytics-appliance={service.value} href={`tel:${business.callPhone.e164}`}><IconPhone size={19} /> Call now</a>
       </div>
     </div>
   </ModalFrame>;

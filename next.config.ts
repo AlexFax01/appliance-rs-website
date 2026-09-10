@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
   // Small landing-page stylesheet: avoid an extra render-blocking round trip.
   experimental: { inlineCss: true },
   output: isClientHost ? "export" : undefined,
-  trailingSlash: isClientHost,
+  trailingSlash: true,
   images: { unoptimized: isClientHost },
 };
 

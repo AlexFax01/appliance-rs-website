@@ -1,8 +1,10 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
-import { IconAlertCircle, IconMessage, IconSend } from "@tabler/icons-react";
+import Image from "next/image";
+import { IconAlertCircle, IconCheck, IconCopy, IconMessage, IconSend } from "@tabler/icons-react";
 import { appliances, business, problemCatalog } from "@/content/site";
+import { trackEvent } from "@/lib/analytics";
 
 type FormState = "idle" | "preparing" | "ready" | "error";
 
@@ -15,13 +17,14 @@ export function ContactForm({ selectedAppliance, onApplianceChange, selectedProb
   const [state, setState] = useState<FormState>("idle");
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const startedAt = useRef(0);
   const [smsHref, setSmsHref] = useState("");
+  const [smsText, setSmsText] = useState("");
+  const [qrDataUrl, setQrDataUrl] = useState("");
+  const [copied, setCopied] = useState(false);
+  const startedAt = useRef(0);
+  const trackedStart = useRef(false);
 
-  useEffect(() => {
-    startedAt.current = Date.now();
-  }, []);
-
+  useEffect(() => { startedAt.current = Date.now(); }, []);
   const options = useMemo(() => [...appliances, { value: "other", title: "Other appliance" }], []);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -31,9 +34,12 @@ export function ContactForm({ selectedAppliance, onApplianceChange, selectedProb
     setState("preparing");
     setMessage("");
     setSmsHref("");
+    setSmsText("");
+    setQrDataUrl("");
+    setCopied(false);
     setErrors({});
 
-    const form = new FormData(event.currentTarget);
+    const form = new FormData(formElement);
     const payload = {
       name: String(form.get("name") ?? ""),
       phone: String(form.get("phone") ?? ""),
@@ -53,9 +59,14 @@ export function ContactForm({ selectedAppliance, onApplianceChange, selectedProb
       pageUrl: window.location.href,
     };
 
-    let schemaModule: typeof import('@/lib/contact-schema');
-    try { schemaModule = await import('@/lib/contact-schema'); }
-    catch {setState('error');setMessage('The form could not finish loading. Your details are saved; please try again.');return;}
+    let schemaModule: typeof import("@/lib/contact-schema");
+    try {
+      schemaModule = await import("@/lib/contact-schema");
+    } catch {
+      setState("error");
+      setMessage("The form could not finish loading. Your details are saved; please try again.");
+      return;
+    }
     const parsed = schemaModule.contactSchema.safeParse(payload);
     if (!parsed.success) {
       const nextErrors: Record<string, string> = {};
@@ -78,13 +89,12 @@ export function ContactForm({ selectedAppliance, onApplianceChange, selectedProb
       return;
     }
 
-    const appliance = options.find(item => item.value === parsed.data.applianceType)?.title ?? "Other appliance";
+    const appliance = options.find((item) => item.value === parsed.data.applianceType)?.title ?? "Other appliance";
     const selectedLabels = (problemCatalog[parsed.data.applianceType] ?? [])
-      .filter(problem => parsed.data.selectedProblemIds.includes(problem.id))
-      .map(problem => problem.label);
+      .filter((problem) => parsed.data.selectedProblemIds.includes(problem.id))
+      .map((problem) => problem.label);
     const lines = [
-      "Hi Appliance RS, I would like to request appliance repair.",
-      "",
+      "Hi Appliance RS, I would like to request appliance repair.", "",
       `Name: ${parsed.data.name}`,
       `My callback number: ${parsed.data.phone}`,
       `Appliance: ${appliance}`,
@@ -99,77 +109,73 @@ export function ContactForm({ selectedAppliance, onApplianceChange, selectedProb
       parsed.data.fallbackToText ? "If I miss your call, please text me." : "",
     ].filter(Boolean).join("\n");
     const separator = /iPad|iPhone|iPod/.test(navigator.userAgent) ? "&" : "?";
-    const href = `sms:${business.phoneHref}${separator}body=${encodeURIComponent(lines)}`;
+    const href = `sms:${business.smsRecipient.e164}${separator}body=${encodeURIComponent(lines)}`;
+    setSmsText(lines);
     setSmsHref(href);
+    trackEvent("repair_form_valid", { appliance_type: parsed.data.applianceType });
+    try {
+      const { toDataURL } = await import("qrcode");
+      setQrDataUrl(await toDataURL(href, { width: 260, margin: 1, errorCorrectionLevel: "M", color: { dark: "#06316d", light: "#ffffff" } }));
+    } catch {
+      // The SMS button and copy fallback stay available if QR generation fails.
+    }
     setState("ready");
-    setMessage("Your service request is ready. Review the text in Messages and press Send.");
-    window.setTimeout(() => document.getElementById("sms-ready-link")?.click(), 0);
+    setMessage("Your request is ready. Review it below, then open Messages and press Send.");
+    window.requestAnimationFrame(() => document.getElementById("sms-ready-panel")?.scrollIntoView({ behavior: "smooth", block: "center" }));
+  }
+
+  async function copyMessage() {
+    try {
+      await navigator.clipboard.writeText(smsText);
+      setCopied(true);
+      trackEvent("sms_copy", { method: "clipboard" });
+    } catch {
+      setCopied(false);
+    }
   }
 
   return (
-    <form className="callback-form" id="callback-form" noValidate onSubmit={submit}>
+    <form className="callback-form" id="callback-form" noValidate onSubmit={submit} onFocusCapture={() => {
+      if (!trackedStart.current) { trackedStart.current = true; trackEvent("repair_form_start"); }
+    }}>
       <div className="form-grid">
-        <Field label="Your name" error={errors.name}>
-          <input aria-invalid={Boolean(errors.name)} autoComplete="name" name="name" placeholder="Jane Smith" required />
-        </Field>
-        <Field label="Phone number" error={errors.phone}>
-          <input aria-invalid={Boolean(errors.phone)} autoComplete="tel" inputMode="tel" name="phone" placeholder="(864) 555-0123" required />
-        </Field>
-        <Field className="form-span" label="Service address" error={errors.address}>
-          <input aria-invalid={Boolean(errors.address)} autoComplete="street-address" name="address" placeholder="123 Main St, Greenville, SC" maxLength={200} required />
-        </Field>
-        <Field label="ZIP code" error={errors.zipCode}>
-          <input aria-invalid={Boolean(errors.zipCode)} autoComplete="postal-code" inputMode="numeric" maxLength={10} name="zipCode" placeholder="29601" value={zip} onChange={event => onZipChange(event.target.value)} required />
-        </Field>
-        <Field label="Appliance" error={errors.applianceType}>
-          <select value={selectedAppliance} onChange={event => onApplianceChange(event.target.value)} name="applianceType">
-            {options.map((item) => <option key={item.value} value={item.value}>{item.title}</option>)}
-          </select>
-        </Field>
-        <Field label="Best time to reach you" error={errors.bestTime}>
-          <select defaultValue="Anytime" name="bestTime">
-            <option>Anytime</option><option>Morning</option><option>Afternoon</option><option>Evening</option>
-          </select>
-        </Field>
+        <Field label="Your name" error={errors.name}><input aria-invalid={Boolean(errors.name)} autoComplete="name" name="name" placeholder="Jane Smith" required /></Field>
+        <Field label="Phone number" error={errors.phone}><input aria-invalid={Boolean(errors.phone)} autoComplete="tel" inputMode="tel" name="phone" placeholder="(864) 555-0123" required /></Field>
+        <Field className="form-span" label="Service address" error={errors.address}><input aria-invalid={Boolean(errors.address)} autoComplete="street-address" name="address" placeholder="123 Main St, Greenville, SC" maxLength={200} required /></Field>
+        <Field label="ZIP code" error={errors.zipCode}><input aria-invalid={Boolean(errors.zipCode)} autoComplete="postal-code" inputMode="numeric" maxLength={10} name="zipCode" placeholder="29601" value={zip} onChange={(event) => onZipChange(event.target.value)} required /></Field>
+        <Field label="Appliance" error={errors.applianceType}><select value={selectedAppliance} onChange={(event) => onApplianceChange(event.target.value)} name="applianceType">{options.map((item) => <option key={item.value} value={item.value}>{item.title}</option>)}</select></Field>
+        <Field label="Best time to reach you" error={errors.bestTime}><select defaultValue="Anytime" name="bestTime"><option>Anytime</option><option>Morning</option><option>Afternoon</option><option>Evening</option></select></Field>
         <Field label="Brand (optional)" error={errors.brand}><input name="brand" placeholder="e.g. Whirlpool" maxLength={80} /></Field>
         <Field label="Model (optional)" error={errors.model}><input name="model" placeholder="Model number from the label" maxLength={100} /></Field>
-        <fieldset className="form-span selected-problems"><legend>Common problems (optional)</legend>
-          <div className="problem-options">{(problemCatalog[selectedAppliance as keyof typeof problemCatalog] ?? []).map(problem => <button type="button" className="problem-option" key={problem.id} aria-pressed={selectedProblemIds.includes(problem.id)} onClick={() => onProblemsChange(selectedProblemIds.includes(problem.id) ? selectedProblemIds.filter(id => id !== problem.id) : [...selectedProblemIds, problem.id])}>{problem.label}</button>)}</div>
-          {errors.selectedProblemIds ? <p className="field-error">{errors.selectedProblemIds}</p> : null}
-        </fieldset>
-        <Field className="form-span" label={selectedProblemIds.length ? "Anything else? (optional)" : "What’s happening?"} error={errors.problem}>
-          <textarea aria-invalid={Boolean(errors.problem)} name="problem" placeholder="Tell us more about what’s happening." required={!selectedProblemIds.length} rows={3} maxLength={1500} />
-        </Field>
+        <fieldset className="form-span selected-problems"><legend>Common problems (optional)</legend><div className="problem-options">{(problemCatalog[selectedAppliance as keyof typeof problemCatalog] ?? []).map((problem) => <button type="button" className="problem-option" key={problem.id} aria-pressed={selectedProblemIds.includes(problem.id)} onClick={() => onProblemsChange(selectedProblemIds.includes(problem.id) ? selectedProblemIds.filter((id) => id !== problem.id) : [...selectedProblemIds, problem.id])}>{problem.label}</button>)}</div>{errors.selectedProblemIds ? <p className="field-error">{errors.selectedProblemIds}</p> : null}</fieldset>
+        <Field className="form-span" label={selectedProblemIds.length ? "Anything else? (optional)" : "What’s happening?"} error={errors.problem}><textarea aria-invalid={Boolean(errors.problem)} name="problem" placeholder="Tell us more about what’s happening." required={!selectedProblemIds.length} rows={3} maxLength={600} /></Field>
       </div>
-      <fieldset className="contact-method">
-        <legend>How should we reply?</legend>
-        <label><input defaultChecked name="preferredContact" type="radio" value="call" /> Call</label>
-        <label><input name="preferredContact" type="radio" value="text" /> Text</label>
-      </fieldset>
-
+      <fieldset className="contact-method"><legend>How should we reply?</legend><label><input defaultChecked name="preferredContact" type="radio" value="call" /> Call</label><label><input name="preferredContact" type="radio" value="text" /> Text</label></fieldset>
       <label className="check-row"><input name="fallbackToText" type="checkbox" /> If I don’t answer, send me a text.</label>
       <label className="check-row"><input name="consent" type="checkbox" /> I agree Appliance RS may contact me about this service request.</label>
       {errors.consent ? <p className="field-error">{errors.consent}</p> : null}
       <input aria-hidden="true" autoComplete="off" className="honeypot" name="website" tabIndex={-1} />
 
-      {message ? (
-        <div aria-live="polite" className={`form-notice form-notice-${state}`} role="status">
-          {state === "ready" ? <IconMessage size={20} /> : <IconAlertCircle size={20} />}<span>{message}{smsHref ? <> <a href={smsHref} id="sms-ready-link">Open the SMS again.</a></> : null}</span>
-        </div>
-      ) : null}
+      {message ? <div aria-live="polite" className={`form-notice form-notice-${state}`} role="status">{state === "ready" ? <IconMessage size={20} /> : <IconAlertCircle size={20} />}<span>{message}</span></div> : null}
 
-      <button className="button-3d button-primary form-submit" disabled={state === "preparing"} type="submit">
-        <IconSend size={21} /> {state === "preparing" ? "Preparing your message…" : "Review & open SMS"}
-      </button>
-      <p className="form-fineprint">Nothing is sent automatically. Your phone opens a prepared text to {business.phoneDisplay}, and you press Send.</p>
+      {state === "ready" ? (
+        <section className="sms-ready-panel" id="sms-ready-panel" aria-label="Prepared SMS request">
+          <div className="sms-review"><span>Prepared message</span><pre>{smsText}</pre></div>
+          <div className="sms-actions">
+            {qrDataUrl ? <div className="sms-qr"><Image alt="QR code that opens the prepared Appliance RS SMS on a phone" height={180} src={qrDataUrl} unoptimized width={180} /><small>Scan with your phone camera to continue in Messages.</small></div> : null}
+            <div className="sms-action-buttons">
+              <a className="button-3d button-orange" href={smsHref} id="sms-ready-link" onClick={() => trackEvent("sms_handoff", { method: "sms_link" })}><IconSend size={20} /> Open SMS</a>
+              <button className="button-3d button-outline" onClick={copyMessage} type="button"><IconCopy size={19} /> {copied ? "Message copied" : "Copy message"}</button>
+              {copied ? <small className="sms-copy-success"><IconCheck size={15} /> Copied. Paste it into Messages on your phone.</small> : null}
+            </div>
+          </div>
+        </section>
+      ) : <button className="button-3d button-primary form-submit" disabled={state === "preparing"} type="submit"><IconSend size={21} /> {state === "preparing" ? "Preparing your message…" : "Review request"}</button>}
+      <p className="form-fineprint">Nothing is sent automatically or stored by this website. You review the prepared text and press Send in Messages.</p>
     </form>
   );
 }
 
 function Field({ label, error, children, className = "" }: { label: string; error?: string; children: React.ReactNode; className?: string }) {
-  return (
-    <label className={`field ${className}`}>
-      <span>{label}</span>{children}{error ? <small className="field-error">{error}</small> : null}
-    </label>
-  );
+  return <label className={`field ${className}`}><span>{label}</span>{children}{error ? <small className="field-error">{error}</small> : null}</label>;
 }

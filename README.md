@@ -1,93 +1,63 @@
 # Appliance RS Website
 
-Standalone redesign demo for Appliance RS. The project is intentionally separate from the source archive and can ship in two ways:
-
-- **Vercel:** Next.js frontend with a device-native, prefilled SMS request flow.
-- **Client PHP hosting:** static site in `out/` with the same SMS request flow. The existing mail handlers remain available for a future approved email mode.
-
-No database, Supabase, CRM, or automation service is required.
-
-Current noindex client demo: <https://appliance-rs-website.vercel.app>
-
-## Site delivery
+Production source for [appliancesc.com](https://appliancesc.com/), a fast static Next.js site for Appliance RS LLC. Production runs on the client’s existing hosting; GitHub plus verified local archives are the recovery sources. The retired Vercel demo is not part of this release.
 
 Built and maintained by [ProgressorAI](https://progressorai.ca/).
+
+## Contact model
+
+- Calls always use `864-924-4349`.
+- The service form prepares an SMS addressed to `864-497-6563` only after local validation.
+- The visitor reviews the prepared message and explicitly opens Messages; nothing is sent or stored by the website.
+- Desktop visitors also receive a local QR and copy fallback. The QR is generated in the browser without a third-party service.
+- There is no CRM, database, email form, SMTP configuration, or server contact endpoint.
 
 ## Local development
 
 ```bash
-npm install
+npm ci
 cp .env.example .env.local
 npm run dev
 ```
 
-The preview defaults to `noindex`. The request form validates locally and opens a prepared SMS addressed to Appliance RS. Nothing is sent until the visitor presses Send in their messaging app.
-
-## Environment variables
+Production public configuration:
 
 ```text
-NEXT_PUBLIC_SITE_URL=https://your-preview-url.example
-NEXT_PUBLIC_SITE_STAGE=preview
-NEXT_PUBLIC_CONTACT_ENDPOINT=/api/contact
-SMTP_HOST=smtp.example.com
-SMTP_PORT=587
-SMTP_USER=...
-SMTP_PASS=...
-CONTACT_FROM_EMAIL=website@example.com
-CONTACT_TO_EMAIL=appliansersl@gmail.com
+NEXT_PUBLIC_SITE_URL=https://appliancesc.com
+NEXT_PUBLIC_SITE_STAGE=production
+NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=client-owned-browser-key
+NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID=client-owned-map-id
 ```
 
-Set `NEXT_PUBLIC_SITE_STAGE=production` only on the final approved production domain. The included `vercel.json` also adds an `X-Robots-Tag: noindex` header to the Vercel demo.
+GA4 is installed only through GTM. The Maps key must be restricted to the production domains and Maps JavaScript API. Empty Maps values keep the click-to-load classic Google map fallback.
 
-## Verification
+## Canonical pages
+
+- `/`
+- `/refrigerator-freezer-repair/`
+- `/ice-maker-repair/`
+- `/washer-dryer-repair/`
+- `/dishwasher-disposal-repair/`
+- `/oven-cooktop-repair/`
+- `/microwave-repair/`
+- `/service-areas/`
+- `/privacy/`
+
+Service content, business details, hours, and the ordered list of 19 communities live in `src/content/site.ts`.
+
+## Verification and client-host build
 
 ```bash
 npm run check
 npm run build:client-host
+npm run test:e2e
 ```
 
-The first command runs ESLint, TypeScript, unit tests, and the standard Next.js build. The second creates the portable client-host package in `out/`.
+`build:client-host` creates the portable static package in `out/` and copies the production `.htaccess`. Upload hashed assets first and HTML last. Verify all nine canonical URLs, the custom 404, robots, sitemap, Call/SMS targets, consent behavior, and the live map after deployment.
 
-## Vercel deployment
+`node scripts/measure-performance.mjs URL LABEL` records five cold-cache mobile Lighthouse runs in `artifacts/performance/`. Run it before and after publishing the GTM container.
 
-1. Import the GitHub repository into Vercel.
-2. Add the environment variables from `.env.example`.
-3. Keep `NEXT_PUBLIC_SITE_STAGE=preview` for the client demo.
-4. Test the SMS handoff on the client’s actual iPhone and Android device before the production-domain launch.
+## Google ownership boundary
 
-## PHP-host deployment
-
-1. Run `npm run build:client-host`.
-2. Upload the contents of `out/` to the client web root.
-3. In `out/api/`, run `composer install --no-dev --optimize-autoloader` on the server or upload the generated `vendor/` folder.
-4. Test the SMS handoff on the production domain. SMTP configuration is only needed if the optional email endpoint is activated later.
-5. If email mode is activated, `build:client-host` includes `/api/contact.php`. Use PHP 8.1+ with GD (JPEG/PNG/WebP), fileinfo, mbstring and OpenSSL and keep production error display disabled.
-
-## Content and assets
-
-- Approved direction: `design/reference/approved-homepage.png`
-- Generated hero: `public/images/hero/appliance-rs-hero.png`
-- Service photos: `public/images/services/`
-- Business content, service areas, reviews, and contact details: `src/content/site.ts`
-- Visual acceptance notes: `design-qa.md`
-
-Google reviews are curated static excerpts with a verification date. They are not scraped at runtime, and the site does not publish review schema.
-
-## Seven improvements (September 2026)
-
-- Existing appliance icons open native dialogs with multiple problem choices and category-specific Google excerpts; selections transfer to the callback form without replacing free-text notes.
-- ZIP matching is advisory, not an availability promise. A configured Google Maps JavaScript map highlights all 19 towns with compact orange/blue markers and a request/call card; ZIP matches select the corresponding town without reloading the map. The SDK loads only near the viewport. Missing configuration or API failure retains the classic embed. See [Google Maps setup](docs/google-maps-setup.md) for keys, Map ID, cost controls and verification.
-- The form builds a complete SMS containing the visitor’s contact details, service address, appliance, chosen problems, description, ZIP, and preferred response time. It opens the phone’s messaging app addressed to 864-924-4349; the visitor reviews it and presses Send.
-- Service towns are ordered by 2020 Census population. Greenville, Spartanburg, Greer, and Simpsonville are emphasized as regional centers; Moore follows the ranked Census places because it has no directly comparable Census-place count.
-- Bounded desktop-only parallax, one-shot icon/button feedback, and a shared $85 explanation preserve the approved page structure. Reduced-motion preferences disable decorative movement.
-- Hero assets are prebuilt AVIF/WebP (`node scripts/prepare-hero.mjs`). The same fonts are locally subset to Latin/punctuation, licensed in `src/app/fonts/`; unsupported name glyphs use system fallback. Optional font display avoids late swaps. Inline CSS is enabled for this small landing page; modal code and validation load on demand.
-
-## Extended checks
-
-Run a production server on port 3100, then `npm run test:e2e` (isolated Chrome). Set `TEST_BASE_URL=http://127.0.0.1:3101` to run against a served PHP export. Browser tests inspect the generated SMS link and never send a customer message.
-
-`PHP_TEST_RUNTIME=/path/to/frankenphp node scripts/test-php.mjs` runs isolated PHP transport/validation checks with a test-only mail class, never included in `out/`. `npm run test:php` remains available on hosts with a normal PHP CLI.
-
-After `vercel build --prod`, run `node scripts/test-vercel-output.mjs` to check the real emitted function, including ESM imports and validated image decoding. It disables SMTP in its own process and never sends external mail.
-
-`node scripts/measure-performance.mjs URL LABEL` writes five cold-cache mobile Lighthouse runs into ignored `artifacts/performance/`. It uses applied DevTools network/CPU throttling rather than simulated Lantern estimates. Record which method was used; lab TBT is not field INP.
+Search Console, GA4, GTM, Google Cloud, Business Profile, and Ads must remain owned by `appliancersl@gmail.com`. The owner accepts legal terms, configures billing and recovery, enables 2FA, and completes identity verification. ProgressorAI receives only named delegated roles; shared passwords and secrets do not belong in GitHub.

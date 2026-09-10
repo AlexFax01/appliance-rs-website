@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -12,10 +11,11 @@ import {
   IconShieldCheck, IconStarFilled, IconX,
 } from "@tabler/icons-react";
 import { appliances, business, faqs, reviews, serviceAreas } from "@/content/site";
-import { ContactChooser } from "./ContactChooser";
 import { ContactForm } from "./ContactForm";
 import { CoverageChecker } from "./CoverageChecker";
 import { HeroVisual } from "./HeroVisual";
+import { HomeStructuredData } from "./StructuredData";
+import { SiteFooter } from "./SiteFooter";
 const ServiceDialog = dynamic(() => import('./ServiceDialog').then(module => module.ServiceDialog), {ssr: false});
 const PriceDialog = dynamic(() => import('./PriceDialog').then(module => module.PriceDialog), {ssr: false});
 
@@ -28,7 +28,6 @@ const applianceIcons = [RefrigeratorIcon, SnowflakeIcon, WashingMachineIcon, Dis
 
 export function ApplianceWebsite() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [contactOpen, setContactOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const [selectedAppliance, setSelectedAppliance] = useState("refrigerator-freezer");
   const [expandedAppliance, setExpandedAppliance] = useState<(typeof appliances)[number]["value"] | null>(null);
@@ -57,6 +56,17 @@ export function ApplianceWebsite() {
   }, [scrollTo]);
 
   useEffect(() => {
+    const parameters = new URLSearchParams(window.location.search);
+    const appliance = parameters.get("appliance");
+    const requestedZip = parameters.get("zip");
+    const timeout = window.setTimeout(() => {
+      if (appliance && appliances.some((item) => item.value === appliance)) setSelectedAppliance(appliance);
+      if (requestedZip) setZip(requestedZip.slice(0, 10));
+    }, 0);
+    return () => window.clearTimeout(timeout);
+  }, []);
+
+  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
@@ -73,6 +83,7 @@ export function ApplianceWebsite() {
 
   return (
     <>
+      <HomeStructuredData />
       <header className="site-header">
         <div className="header-inner">
           <a aria-label="Go to top" className="brand" href="#home" onClick={(event) => followSectionLink(event, "home")}>
@@ -84,9 +95,9 @@ export function ApplianceWebsite() {
               <a className={activeSection === id ? "active" : ""} href={`#${id}`} key={id} onClick={(event) => followSectionLink(event, id)}>{label}</a>
             ))}
           </nav>
-          <button className="button-3d button-orange header-cta" onClick={() => setContactOpen(true)} type="button">
-            <IconPhone className="phone-wiggle" size={19} /><span>Call or Text</span><strong>{business.phoneDisplay}</strong>
-          </button>
+          <a className="button-3d button-orange header-cta" data-analytics-event="call_click" data-analytics-location="header" href={`tel:${business.callPhone.e164}`}>
+            <IconPhone className="phone-wiggle" size={19} /><span>Call now</span><strong>{business.callPhone.display}</strong>
+          </a>
           <button aria-controls="mobile-navigation" aria-expanded={mobileOpen} aria-label="Toggle navigation" className="icon-button menu-button" onClick={() => setMobileOpen((value) => !value)} type="button">
             {mobileOpen ? <IconX /> : <IconMenu2 />}
           </button>
@@ -94,7 +105,7 @@ export function ApplianceWebsite() {
         {mobileOpen ? (
           <nav aria-label="Mobile navigation" className="mobile-nav" id="mobile-navigation">
             {navItems.map(([id, label]) => <a aria-current={activeSection === id ? "page" : undefined} href={`#${id}`} key={id} onClick={() => setMobileOpen(false)}>{label}</a>)}
-            <button className="button-3d button-orange" onClick={() => { setMobileOpen(false); setContactOpen(true); }} type="button">Call or Text {business.phoneDisplay}</button>
+            <a className="button-3d button-orange" data-analytics-event="call_click" data-analytics-location="mobile_menu" href={`tel:${business.callPhone.e164}`} onClick={() => setMobileOpen(false)}>Call {business.callPhone.display}</a>
           </nav>
         ) : null}
       </header>
@@ -109,8 +120,8 @@ export function ApplianceWebsite() {
               <span><IconShieldCheck /> Fully Insured</span><span><IconCoin /> Clear Pricing</span><span><IconCircleCheck /> Pay After Repair</span>
             </div>
             <div className="hero-actions">
-              <button className="button-3d button-orange button-large" onClick={() => setContactOpen(true)} type="button"><IconPhone className="phone-wiggle" /> Call or Text {business.phoneDisplay}</button>
-              <button className="text-action" onClick={() => requestCallback()} type="button">Request a callback <IconArrowRight /></button>
+              <a className="button-3d button-orange button-large" data-analytics-event="call_click" data-analytics-location="hero" href={`tel:${business.callPhone.e164}`}><IconPhone className="phone-wiggle" /> Call {business.callPhone.display}</a>
+              <button className="text-action" data-analytics-event="request_repair_click" data-analytics-location="hero" onClick={() => requestCallback()} type="button">Request by text <IconArrowRight /></button>
             </div>
             <p className="location-note"><IconMapPin /> Proudly serving the Upstate of South Carolina</p>
           </div>
@@ -128,6 +139,8 @@ export function ApplianceWebsite() {
                   data-appliance={item.value}
                   aria-expanded={isExpanded}
                   className={`service-card${isExpanded ? " is-active" : ""}`}
+                  data-analytics-event="service_view"
+                  data-analytics-appliance={item.value}
                   key={item.value}
                   onClick={() => setExpandedAppliance(item.value)}
                   type="button"
@@ -156,7 +169,7 @@ export function ApplianceWebsite() {
         <section className="section process-section" id="process">
           <div className="section-heading centered"><p className="eyebrow">Four clear steps</p><h2>Our Simple Process</h2></div>
           <ol className="process-list">
-            <Process number="1" title="Call or Text">Call or text us 24/7. We’ll schedule a time that works for you.</Process>
+            <Process number="1" title="Call or request by text">Submit a service request anytime. We’ll confirm a time that works for you.</Process>
             <Process number="2" title="On-Site Diagnosis">We find the issue and explain your options clearly.</Process>
             <Process number="3" title="Upfront Quote">You’ll know the cost before we start any work.</Process>
             <Process number="4" title="Expert Repair">We repair it right the first time and test everything.</Process>
@@ -179,7 +192,7 @@ export function ApplianceWebsite() {
         </section>
 
         <section className="section reviews-section" id="reviews">
-          <div className="reviews-top"><div className="section-heading"><p className="eyebrow">Real local feedback</p><h2>Trusted by Upstate homeowners</h2></div><a className="google-rating" href={business.googleProfile} rel="noreferrer" target="_blank"><IconBrandGoogle /><span><strong>5.0 on Google</strong><small>60 reviews</small></span></a></div>
+          <div className="reviews-top"><div className="section-heading"><p className="eyebrow">Real local feedback</p><h2>Trusted by Upstate homeowners</h2></div><a className="google-rating" data-analytics-event="google_profile_click" data-analytics-location="reviews" href={business.googleProfile} rel="noreferrer" target="_blank"><IconBrandGoogle /><span><strong>5.0 on Google</strong><small>60+ reviews</small></span></a></div>
           <div className="review-grid">
             {reviews.map((review) => (
               <article className="review-card" key={review.name}>
@@ -192,7 +205,7 @@ export function ApplianceWebsite() {
         </section>
 
         <section className="section contact-section" id="contact">
-          <div className="contact-copy"><p className="eyebrow">Request service by text</p><h2>Tell us what’s going on. We’ll build the message.</h2><p>Complete the form and we’ll open a ready-to-send SMS to Appliance RS. Review it and press Send.</p><a className="contact-phone" href={`tel:${business.phoneHref}`}><IconPhone /> {business.phoneDisplay}</a><ul><li><IconCheck /> Calls and texts welcome 24/7</li><li><IconCheck /> Your details stay in the message</li><li><IconCheck /> You choose when to send</li></ul></div>
+          <div className="contact-copy"><p className="eyebrow">Request service by text</p><h2>Tell us what’s going on. We’ll build the message.</h2><p>Complete the form and we’ll prepare a text to the service team. Review it and press Send in Messages.</p><a className="contact-phone" data-analytics-event="call_click" data-analytics-location="contact" href={`tel:${business.callPhone.e164}`}><IconPhone /> {business.callPhone.display}</a><ul><li><IconCheck /> Service requests accepted 24/7</li><li><IconCheck /> Your details stay on your device</li><li><IconCheck /> You choose when to send</li></ul></div>
           <ContactForm selectedAppliance={selectedAppliance} onApplianceChange={setSelectedAppliance} selectedProblemIds={problemSelections[selectedAppliance] ?? []} onProblemsChange={ids => setProblems(selectedAppliance, ids)} zip={zip} onZipChange={setZip} />
         </section>
 
@@ -202,28 +215,16 @@ export function ApplianceWebsite() {
         </section>
 
         <section className="final-cta">
-          <div className="final-icon"><IconPhone /></div><div><p>Need Appliance Repair?</p><h2>Call or Text <span>{business.phoneDisplay}</span></h2><small>We’ll get your home running smoothly again—fast.</small></div>
-          <button className="button-3d button-orange button-large" onClick={() => setContactOpen(true)} type="button"><IconPhone /> Call or Text Now</button>
+          <div className="final-icon"><IconPhone /></div><div><p>Need Appliance Repair?</p><h2>Call <span>{business.callPhone.display}</span></h2><small>Or prepare a detailed service request by text.</small></div>
+          <div className="final-cta-actions"><a className="button-3d button-orange button-large" data-analytics-event="call_click" data-analytics-location="final_cta" href={`tel:${business.callPhone.e164}`}><IconPhone /> Call now</a><button className="button-3d button-light" data-analytics-event="request_repair_click" data-analytics-location="final_cta" onClick={() => requestCallback()} type="button"><IconMessageCircle /> Request by text</button></div>
         </section>
       </main>
 
-      <footer className="site-footer">
-        <div className="footer-brand"><Image alt="Appliance RS logo" height={44} src="/images/brand/appliance-rs-logo.webp" width={44} /><span><strong>{business.name}</strong><small>{business.tagline}</small></span></div>
-        <p>© 2026 Appliance RS. All rights reserved.</p>
-        <div className="footer-meta">
-          <div className="footer-links"><Link href="/privacy">Privacy</Link><span>Fully Insured</span><span>Pay After Repair</span><span>Clear Pricing</span></div>
-          <a className="footer-credit" href="https://progressorai.ca/" rel="noreferrer" target="_blank">
-            <Image alt="" aria-hidden="true" height={12} src="/images/brand/progressorai-logo.png" width={13} />
-            <span>Website crafted by <strong>ProgressorAI</strong></span>
-            <IconArrowRight aria-hidden="true" size={12} />
-          </a>
-        </div>
-      </footer>
+      <SiteFooter />
 
-      <nav aria-label="Quick contact" className="mobile-contact-bar"><a className="mobile-call" href={`tel:${business.phoneHref}`}><IconPhone /> Call</a><button onClick={() => requestCallback()} type="button"><IconMessageCircle /> Request callback</button></nav>
+      <nav aria-label="Quick contact" className="mobile-contact-bar"><a className="mobile-call" data-analytics-event="call_click" data-analytics-location="mobile_bar" href={`tel:${business.callPhone.e164}`}><IconPhone /> Call</a><button data-analytics-event="request_repair_click" data-analytics-location="mobile_bar" onClick={() => requestCallback()} type="button"><IconMessageCircle /> Request by text</button></nav>
       {expandedApplianceDetails ? <ServiceDialog key={expandedApplianceDetails.value} onClose={() => setExpandedAppliance(null)} onRequest={requestCallback} service={expandedApplianceDetails} selectedProblemIds={problemSelections[expandedApplianceDetails.value] ?? []} onProblemsChange={ids => setProblems(expandedApplianceDetails.value, ids)} /> : null}
       {priceOpen ? <PriceDialog onClose={() => setPriceOpen(false)} onRequest={() => requestCallback()} /> : null}
-      <ContactChooser onClose={() => setContactOpen(false)} onRequestCallback={() => requestCallback()} open={contactOpen} />
     </>
   );
 }

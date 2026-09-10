@@ -5,7 +5,7 @@ import { IconArrowLeft, IconPhone } from "@tabler/icons-react";
 import { business } from "@/content/site";
 
 export const metadata: Metadata = {
-  title: "Page Not Found | Appliance RS",
+  title: "Page Not Found",
   description: "The requested Appliance RS page could not be found.",
   robots: { index: false, follow: false },
 };
@@ -20,7 +20,7 @@ export default function NotFound() {
         <p>The link may be outdated. Return to the Appliance RS homepage or call us directly for service.</p>
         <div className="not-found-actions">
           <Link className="button-3d button-primary" href="/"><IconArrowLeft size={19} /> Back to home</Link>
-          <a className="button-3d button-orange" href={`tel:${business.phoneHref}`}><IconPhone size={19} /> Call {business.phoneDisplay}</a>
+          <a className="button-3d button-orange" data-analytics-event="call_click" data-analytics-location="404" href={`tel:${business.callPhone.e164}`}><IconPhone size={19} /> Call {business.callPhone.display}</a>
         </div>
       </article>
     </main>

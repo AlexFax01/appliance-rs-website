@@ -1,11 +1,14 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { IconMapPin, IconArrowRight, IconBrandGoogle } from "@tabler/icons-react";
 import { checkCoverage, coverageSource } from "@/content/coverage";
 import { business } from "@/content/site";
+import { trackEvent } from "@/lib/analytics";
 import { ServiceAreaMap } from "./ServiceAreaMap";
 
-export function CoverageChecker({onZip}: {onZip: (zip: string) => void}) {
+export function CoverageChecker({onZip = () => undefined}: {onZip?: (zip: string) => void}) {
+  const router = useRouter();
   const [zip, setZip] = useState("");
   const [result, setResult] = useState<ReturnType<typeof checkCoverage> | null>(null);
   const evaluate = (value: string, showInvalid = true) => {
@@ -15,7 +18,10 @@ export function CoverageChecker({onZip}: {onZip: (zip: string) => void}) {
       return;
     }
     setResult(answer);
-    if (answer.status !== "invalid") onZip(answer.zip);
+    if (answer.status !== "invalid") {
+      onZip(answer.zip);
+      trackEvent("zip_check", { coverage_result: answer.status === "listed" ? "covered" : "unknown" });
+    }
   };
   return <div className="map-card coverage-card">
     <div className="coverage-checker">
@@ -36,10 +42,15 @@ export function CoverageChecker({onZip}: {onZip: (zip: string) => void}) {
       <ServiceAreaMap selectedTown={result?.status === "listed" ? result.town ?? null : null} onRequest={town => {
         const requestZip = result?.status === "listed" && result.town === town.name ? result.zip : town.zips[0];
         setZip(requestZip); evaluate(requestZip);
-        document.getElementById("contact")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+        const contact = document.getElementById("contact");
+        if (!contact) {
+          router.push(`/?zip=${encodeURIComponent(requestZip)}#contact`);
+          return;
+        }
+        contact.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
         document.querySelector<HTMLInputElement>('#contact [name="name"]')?.focus({ preventScroll: true });
       }} />
     </div>
-    <a className="map-link" href={business.googleProfile} rel="noreferrer" target="_blank"><IconBrandGoogle /> Open Appliance RS on Google <IconArrowRight /></a>
+    <a className="map-link" data-analytics-event="google_profile_click" data-analytics-location="service_map" href={business.googleProfile} rel="noreferrer" target="_blank"><IconBrandGoogle /> Open Appliance RS on Google <IconArrowRight /></a>
   </div>;
 }
