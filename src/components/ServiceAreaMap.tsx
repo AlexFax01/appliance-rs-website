@@ -20,7 +20,7 @@ export function ServiceAreaMap({ selectedTown, onRequest }: {
   const closeButton = useRef<HTMLButtonElement>(null);
   const controller = useRef<ServiceMapController | null>(null);
   const latestTown = useRef(selectedTown);
-  const [state, setState] = useState<"idle" | "loading" | "ready" | "fallback">("idle");
+  const [state, setState] = useState<"loading" | "ready" | "fallback">(configured ? "loading" : "fallback");
   const [activated, setActivated] = useState(false);
   const [selected, setSelected] = useState<MapTown | null>(null);
   const [expanded, setExpanded] = useState(false);
@@ -43,6 +43,23 @@ export function ServiceAreaMap({ selectedTown, onRequest }: {
       focusTarget?.focus();
     };
   }, [expanded]);
+  useEffect(() => {
+    if (!configured || activated) return;
+    const frame = container.current?.closest(".town-map-frame");
+    if (!frame || typeof IntersectionObserver === "undefined") {
+      setActivated(true);
+      trackEvent("map_open", { map_type: "javascript", trigger: "automatic" });
+      return;
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry?.isIntersecting) return;
+      setActivated(true);
+      trackEvent("map_open", { map_type: "javascript", trigger: "automatic" });
+      observer.disconnect();
+    }, { rootMargin: "320px 0px" });
+    observer.observe(frame);
+    return () => observer.disconnect();
+  }, [activated]);
   useEffect(() => {
     if (!activated) return;
     if (!configured) return;
@@ -80,7 +97,7 @@ export function ServiceAreaMap({ selectedTown, onRequest }: {
   }, [activated]);
 
   return <div className={`town-map ${state === "fallback" ? "town-map-fallback" : ""}${expanded ? " is-expanded" : ""}`} role={expanded ? "dialog" : undefined} aria-modal={expanded || undefined} aria-label={expanded ? "Expanded Appliance RS service area map" : undefined}>
-    {state !== "idle" && state !== "fallback" && <div className="town-map-toolbar">
+    {state !== "fallback" && <div className="town-map-toolbar">
       <div className="town-map-legend"><span><i className="legend-primary" />Main cities</span><span><i />Service towns</span><span className="legend-area"><i />Approx. service area</span></div>
       <div className="town-map-tools">
         <button type="button" disabled={state !== "ready"} onClick={() => controller.current?.reset()}><IconFocus2 size={18} />Show all</button>
@@ -89,12 +106,12 @@ export function ServiceAreaMap({ selectedTown, onRequest }: {
       </div>
     </div>}
     <div className="classic-map-frame town-map-frame">
-      {state === "idle" ? <div className="map-activation"><IconMapPin size={38} /><p className="eyebrow">Interactive Google map</p><h4>See where Appliance RS works</h4><p>Open the map to explore the listed service towns. The map stays unloaded until you choose to view it.</p><button className="button-3d button-primary" onClick={() => { if (configured) { setState("loading"); setActivated(true); } else setState("fallback"); trackEvent("map_open", { map_type: configured ? "javascript" : "embed" }); }} type="button">Open Google map <IconArrowRight size={17} /></button></div> : state === "fallback" ? <iframe allowFullScreen loading="lazy" referrerPolicy="strict-origin-when-cross-origin" src={business.mapEmbed} title="Appliance RS service area on Google Maps" /> : <>
+      {state === "fallback" ? <iframe allowFullScreen loading="lazy" referrerPolicy="strict-origin-when-cross-origin" src={business.mapEmbed} title="Appliance RS service area on Google Maps" onLoad={() => trackEvent("map_open", { map_type: "embed", trigger: "automatic" })} /> : <>
         <div ref={container} className="town-map-canvas" aria-label="Appliance RS service towns on Google Maps" />
         {state === "loading" && <div className="town-map-loading" role="status"><IconMapPin size={28} /><span>Loading your local service area…</span></div>}
       </>}
-      {state !== "idle" && state !== "fallback" && !selected && <div className="town-map-hint"><IconMapPin size={17} /><span>Tap a branded pin to view local service.</span></div>}
-      {state !== "idle" && state !== "fallback" && selected && <div className="town-map-details" aria-live="polite" aria-atomic="true">
+      {state !== "fallback" && !selected && <div className="town-map-hint"><IconMapPin size={17} /><span>Tap a branded pin to view local service.</span></div>}
+      {state !== "fallback" && selected && <div className="town-map-details" aria-live="polite" aria-atomic="true">
         <div className="town-map-detail-copy">
           <span className="town-map-kicker">Local appliance repair</span>
           <h4>{selected.name}, SC</h4>

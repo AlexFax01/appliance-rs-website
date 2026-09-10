@@ -5,7 +5,7 @@ import path from 'node:path';
 // All SDK requests are intercepted: no Google quota or real credentials used.
 test.describe('configured map integration (test provider)', () => {
   test.skip(process.env.TEST_MAPS !== '1', 'Requires isolated configured map build');
-  test('deferred SDK, town selection, ZIP transfer and one map instance', async ({ page }) => {
+  test('viewport-deferred SDK, town selection, ZIP transfer and one map instance', async ({ page }) => {
     let sdkLoads = 0;
     await page.route('https://maps.googleapis.com/maps/api/js?**', async route => {
       sdkLoads++;
@@ -14,7 +14,6 @@ test.describe('configured map integration (test provider)', () => {
     await page.goto('/');
     expect(sdkLoads).toBe(0);
     await page.locator('.town-map').scrollIntoViewIfNeeded();
-    await page.getByRole('button', { name: 'Open Google map', exact: true }).click();
     await expect(page.getByRole('button', { name: 'Show all', exact: true })).toBeEnabled();
     await expect(page.locator('.town-pin')).toHaveCount(19);
     await expect(page.locator('.town-pin-primary')).toHaveCount(4);
@@ -48,7 +47,6 @@ test.describe('configured map integration (test provider)', () => {
     await page.route('https://maps.googleapis.com/maps/api/js?**', route => route.fulfill({ path: path.resolve('tests/fixtures/maps-provider.js'), contentType: 'text/javascript' }));
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/'); await page.locator('.town-map').scrollIntoViewIfNeeded();
-    await page.getByRole('button', { name: 'Open Google map', exact: true }).click();
     await expect(page.getByRole('button', { name: 'Expand map', exact: true })).toBeEnabled();
     await page.getByRole('button', { name: 'Expand map', exact: true }).click();
     await expect(page.locator('.town-map')).toHaveClass(/is-expanded/);
@@ -62,7 +60,6 @@ test.describe('configured map integration (test provider)', () => {
   test('blocked SDK falls back to classic map and working ZIP checker', async ({ page }) => {
     await page.route('https://maps.googleapis.com/maps/api/js?**', route => route.abort());
     await page.goto('/'); await page.locator('.town-map').scrollIntoViewIfNeeded();
-    await page.getByRole('button', { name: 'Open Google map', exact: true }).click();
     await expect(page.locator('.classic-map-frame iframe')).toBeVisible({ timeout: 20000 });
     await page.locator('#coverage-zip').fill('29601');
     await expect(page.locator('.coverage-result')).toContainText('Greenville');
@@ -70,7 +67,6 @@ test.describe('configured map integration (test provider)', () => {
   test('authentication failure restores classic embed', async ({ page }) => {
     await page.route('https://maps.googleapis.com/maps/api/js?**', route => route.fulfill({ path: path.resolve('tests/fixtures/maps-provider.js'), contentType: 'text/javascript' }));
     await page.goto('/'); await page.locator('.town-map').scrollIntoViewIfNeeded();
-    await page.getByRole('button', { name: 'Open Google map', exact: true }).click();
     await expect(page.getByRole('button', { name: 'Show all', exact: true })).toBeEnabled();
     await page.evaluate(() => (window as Window & { gm_authFailure?: () => void }).gm_authFailure?.());
     await expect(page.locator('.classic-map-frame iframe')).toBeVisible();
