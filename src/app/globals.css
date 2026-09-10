@@ -239,6 +239,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .form-notice-ready { background: #e8f2ff; color: var(--navy); }
 .form-notice-preview { background: #fff4df; color: #7c4800; }
 .form-notice-error { background: #feecec; color: #9d2222; }
+.form-error-list { margin: 8px 0 0; padding-left: 18px; }
+.form-error-list button { background: none; border: 0; color: inherit; cursor: pointer; font: inherit; min-height: 44px; padding: 6px 0; text-align: left; text-decoration: underline; text-underline-offset: 3px; }
+.form-error-list button:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
 .form-notice svg { flex-shrink: 0; }
 .form-notice a { color: var(--blue); font-weight: 850; }
 .form-submit { margin-top: 15px; width: 100%; }

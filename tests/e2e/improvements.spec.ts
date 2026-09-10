@@ -62,7 +62,7 @@ test('selected-only request works without a written description',async({page})=>
 
 test('invalid form moves focus and scrolls to the first field that needs attention',async({page})=>{
  await page.goto('/');await page.locator('#contact').scrollIntoViewIfNeeded();await page.getByRole('button',{name:'Review request'}).click();
- await expect(page.locator('[name=name]')).toBeFocused();await expect(page.locator('[name=name]')).toBeInViewport();await expect(page.locator('.form-notice')).toContainText('highlighted fields');
+ await expect(page.locator('[name=name]')).toBeFocused();await expect(page.locator('[name=name]')).toBeInViewport();await expect(page.locator('.form-notice')).toContainText('Please fix the following fields');
 });
 
 test('unknown routes show the branded non-indexable 404 page',async({page})=>{

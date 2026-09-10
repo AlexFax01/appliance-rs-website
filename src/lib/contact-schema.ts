@@ -12,7 +12,7 @@ export const contactSchema = z.object({
   phone: z.string().trim().min(10, "Please enter a valid phone number.").max(30).refine(value => value.replace(/\D/g, "").length >= 10, "Please enter a valid phone number."),
   applianceType: z.enum(applianceValues),
   problem: z.string().trim().max(600, "Please keep the additional details under 600 characters.").default(""),
-  selectedProblemIds: z.array(z.string().max(80)).max(4).default([]),
+  selectedProblemIds: z.array(z.string().max(80)).max(4, "Please choose up to four common problems.").default([]),
   brand: z.string().trim().max(80).default(""),
   model: z.string().trim().max(100).default(""),
   address: z.string().trim().min(5, "Please enter the service address.").max(200),
@@ -20,7 +20,7 @@ export const contactSchema = z.object({
   preferredContact: z.enum(contactMethods),
   bestTime: z.string().trim().min(2, "Please choose the best time to reach you.").max(80),
   fallbackToText: z.boolean().default(false),
-  consent: z.literal(true, { error: "Please confirm we may contact you." }),
+  consent: z.boolean().refine(value => value, "Please confirm we may contact you."),
   website: z.string().max(0).optional().default(""),
   formStartedAt: z.coerce.number().int().positive(),
   pageUrl: z.string().url().optional().or(z.literal("")),
@@ -31,7 +31,7 @@ export const contactSchema = z.object({
     ctx.addIssue({code: "custom", path: ["selectedProblemIds"], message: "Please choose problems for the selected appliance."});
   }
   if (!data.selectedProblemIds.length && data.problem.length < 10) {
-    ctx.addIssue({code: "custom", path: ["problem"], message: "Select a problem or briefly describe what’s happening."});
+    ctx.addIssue({code: "custom", path: ["problem"], message: "Select a common problem or enter at least 10 characters describing what’s happening."});
   }
 });
 

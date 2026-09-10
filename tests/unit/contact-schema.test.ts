@@ -15,4 +15,9 @@ describe("contactSchema", () => {
   });
   it("rejects an invalid ZIP code", () => expect(contactSchema.safeParse({ ...valid, zipCode: "abc" }).success).toBe(false));
   it("requires a service address", () => expect(contactSchema.safeParse({ ...valid, address: "" }).success).toBe(false));
+  it("reports a missing problem and contact permission together", () => {
+    const result = contactSchema.safeParse({ ...valid, problem: "", consent: false });
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error.issues.map(issue => issue.path[0])).toEqual(expect.arrayContaining(["problem", "consent"]));
+  });
 });

@@ -54,7 +54,7 @@ npm run build:client-host
 npm run test:e2e
 ```
 
-`build:client-host` creates the portable static package in `out/` and copies the production `.htaccess`. Upload hashed assets first and HTML last. Verify all nine canonical URLs, the custom 404, robots, sitemap, Call/SMS targets, consent behavior, and the live map after deployment.
+`build:client-host` creates the portable static package in `out/` and copies the production `.htaccess`. Upload hashed assets first and HTML last. Retain previous hashed files in `_next/static` during deployment: already-open pages may still request them. Never delete that directory before uploading a release. Form validation ships with the form; the optional QR library must not block validation or SMS review. Verify all nine canonical URLs, the custom 404, robots, sitemap, Call/SMS targets, consent behavior, and the live map after deployment.
 
 `node scripts/measure-performance.mjs URL LABEL` records five cold-cache mobile Lighthouse runs in `artifacts/performance/`. Run it before and after publishing the GTM container.
 
