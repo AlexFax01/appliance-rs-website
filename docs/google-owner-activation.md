@@ -31,18 +31,23 @@ Remaining configuration:
 
 ## 2. Google Tag Manager
 
-The creation wizard is staged with:
+Created September 10, 2026 with:
 
 - account: `Appliance RS LLC`;
 - country: United States;
 - container: `Appliance RS Website`;
 - target platform: Website;
 - anonymous data sharing: off.
+- account ID: `6376260244`;
+- container ID: `263810382`;
+- public ID: `GTM-59GNC338`;
+- GDPR data-processing terms: accepted.
 
-Pending action:
+Remaining configuration:
 
-1. Confirm the final `Yes` action that creates the persistent GTM account/container.
-2. Record the new `GTM-...` container ID.
+1. Configure the Google tag and approved non-PII event tags from `docs/gtm-measurement-plan.md`.
+2. Validate consent states and one-time event delivery in Tag Assistant and GA4 DebugView.
+3. Obtain approval immediately before publishing the first named container version.
 
 After both GA4 and GTM exist, ProgressorAI can configure the tags from `docs/gtm-measurement-plan.md`, build the production site with the real public GTM ID, publish a named GTM version, and verify consent plus events in Tag Assistant.
 

@@ -14,7 +14,7 @@ Agency access: named ProgressorAI account only; never a shared password.
 | GA4 account | Appliance RS LLC (`407663541`) | `appliancersl@gmail.com` | Created September 10, 2026; United States terms and Google Ads data-processing terms accepted |
 | GA4 property | Appliance RS Website (`553717251`) | `appliancersl@gmail.com` | Active; United States, Eastern Time, USD, Home & Garden, 1-10 employees, lead-generation and engagement objectives |
 | GA4 web stream | Appliance RS Website (`15756951281`, `G-DQ5ZH4QG69`) | `appliancersl@gmail.com` | Active for `https://appliancesc.com`; enhanced form interactions disabled; production collection waits for GTM activation |
-| GTM web container | Appliance RS Website | `appliancersl@gmail.com` | Account `Appliance RS LLC` and Website container staged; owner acceptance of Tag Manager terms is the next action |
+| GTM web container | Appliance RS Website (`GTM-59GNC338`; account `6376260244`, container `263810382`) | `appliancersl@gmail.com` | Created September 10, 2026; GDPR data-processing terms accepted; container is not yet configured or published |
 | Google Cloud project | My First Project (`project-3bc5bc8b-4231-4ef3-b98`) | `appliancersl@gmail.com` | Active with client billing/free-trial account; Maps JavaScript API enabled September 10, 2026 |
 | Maps browser key | Appliance RS Website (`20550761-46d2-4c96-8350-0d7d92c4ea42`) | `appliancersl@gmail.com` | Active; restricted to `https://appliancesc.com/*` and Maps JavaScript API |
 | Maps Map ID | `c153fc6441a7350678380d17` | `appliancersl@gmail.com` | Active production JavaScript vector map |
@@ -42,7 +42,7 @@ Agency access: named ProgressorAI account only; never a shared password.
 ## Owner-action boundary observed September 10, 2026
 
 - GA4 account, property, and web stream are active. Event-data and user-data retention are both set to 14 months as of September 10, 2026; reset on new user activity remains enabled.
-- GTM is paused at the Tag Manager terms dialog. The owner must review and accept the agreement and make the GDPR data-processing choice.
+- GTM account and web container are active. The empty container still needs the consent-aware GA4 configuration, event tags, validation, and a separately approved first publication.
 - Search Console cannot yet expose a sitemap or URL Inspection because `appliancersl@gmail.com` is not a verified user for the domain property.
 - The authoritative nameservers are `ns1.ssdlinux35.accuwebhosting.com` and `ns2.ssdlinux35.accuwebhosting.com`. The supplied FTPS login does not authenticate to cPanel, so it does not provide DNS-zone authority. A DNS-capable AccuWeb login or owner-added TXT record is required.
 - The live site is already technically ready for measurement. Do not add a placeholder GTM ID or duplicate direct `gtag.js` while the client-owned resources are pending.
