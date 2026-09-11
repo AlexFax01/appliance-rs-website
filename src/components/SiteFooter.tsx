@@ -12,7 +12,7 @@ export function SiteFooter() {
       <div className="footer-meta">
         <div className="footer-links"><Link href="/privacy/">Privacy</Link><CookieSettingsButton /><span>Fully Insured</span><span>Pay After Repair</span><span>Clear Pricing</span></div>
         <a className="footer-credit" href="https://progressorai.ca/" rel="noreferrer" target="_blank">
-          <Image alt="" aria-hidden="true" height={12} src="/images/brand/progressorai-logo.png" width={13} />
+          <Image alt="" aria-hidden="true" height={12} src="/images/brand/progressorai-logo.png" style={{ objectFit: "contain" }} width={12} />
           <span>Website crafted by <strong>ProgressorAI</strong></span>
           <IconArrowRight aria-hidden="true" size={12} />
         </a>

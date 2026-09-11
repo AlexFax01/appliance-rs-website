@@ -10,11 +10,11 @@ Agency access: named ProgressorAI account only; never a shared password.
 | Website | `https://appliancesc.com/` | Appliance RS LLC | Production hosting; nine canonical URLs prepared |
 | Google Business Profile | Appliance RS LLC (`/g/11z7t4g7sf`) | `appliancersl@gmail.com` | Verified profile; HTTPS/UTM, public-chat removal, repair attribute, and disposal service submitted for Google review September 10, 2026 |
 | Google Ads | `293-049-5593` | `appliancersl@gmail.com` | Existing; Calls from ads is the 60-second primary action; inactive website-call duplicate moved to secondary; budgets and bidding unchanged |
-| Search Console | Domain property `appliancesc.com` | `appliancersl@gmail.com` | Created September 10, 2026; DNS verification pending |
-| GA4 account | Appliance RS LLC | `appliancersl@gmail.com` | Creation blocked on owner acceptance of Analytics terms |
-| GA4 property | Appliance RS Website | `appliancersl@gmail.com` | Pending GA4 account creation |
+| Search Console | Domain property `appliancesc.com` | `appliancersl@gmail.com` | Not verified in the client account. Search Console reports that the signed-in client account has no access; DNS ownership confirmation is required |
+| GA4 account | Appliance RS LLC | `appliancersl@gmail.com` | Configuration staged; owner acceptance of Analytics terms is the next action |
+| GA4 property | Appliance RS Website | `appliancersl@gmail.com` | Staged with United States, Eastern Time, USD, Home & Garden, 1-10 employees, lead-generation and engagement objectives; not created until terms are accepted |
 | GA4 web stream | `https://appliancesc.com` | `appliancersl@gmail.com` | Pending GA4 account creation |
-| GTM web container | Appliance RS Website | `appliancersl@gmail.com` | Creation blocked on owner acceptance of Tag Manager terms |
+| GTM web container | Appliance RS Website | `appliancersl@gmail.com` | Account `Appliance RS LLC` and Website container staged; owner acceptance of Tag Manager terms is the next action |
 | Google Cloud project | My First Project (`project-3bc5bc8b-4231-4ef3-b98`) | `appliancersl@gmail.com` | Active with client billing/free-trial account; Maps JavaScript API enabled September 10, 2026 |
 | Maps browser key | Appliance RS Website (`20550761-46d2-4c96-8350-0d7d92c4ea42`) | `appliancersl@gmail.com` | Active; restricted to `https://appliancesc.com/*` and Maps JavaScript API |
 | Maps Map ID | `c153fc6441a7350678380d17` | `appliancersl@gmail.com` | Active production JavaScript vector map |
@@ -38,6 +38,14 @@ Agency access: named ProgressorAI account only; never a shared password.
 - Billing Admin is not assigned to ProgressorAI unless the owner explicitly decides it is necessary.
 - DNS verification TXT records remain in DNS after Search Console verification.
 - API keys, recovery codes, personal documents, and passwords are never stored in GitHub.
+
+## Owner-action boundary observed September 10, 2026
+
+- GA4 is paused at the Google Analytics terms dialog. The owner must review and accept the United States terms and make the GDPR data-processing choice.
+- GTM is paused at the Tag Manager terms dialog. The owner must review and accept the agreement and make the GDPR data-processing choice.
+- Search Console cannot yet expose a sitemap or URL Inspection because `appliancersl@gmail.com` is not a verified user for the domain property.
+- The authoritative nameservers are `ns1.ssdlinux35.accuwebhosting.com` and `ns2.ssdlinux35.accuwebhosting.com`. The supplied FTPS login does not authenticate to cPanel, so it does not provide DNS-zone authority. A DNS-capable AccuWeb login or owner-added TXT record is required.
+- The live site is already technically ready for measurement. Do not add a placeholder GTM ID or duplicate direct `gtag.js` while the client-owned resources are pending.
 
 ## Release identifiers to record after creation
 
