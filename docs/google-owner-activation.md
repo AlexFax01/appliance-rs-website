@@ -4,9 +4,9 @@ Last checked: 2026-09-10
 
 These are the remaining owner-only actions. Complete them while signed in as `appliancersl@gmail.com`. Do not use a shared agency account and do not send passwords or recovery codes by email or chat.
 
-## 1. Google Analytics 4
+## 1. Google Analytics 4 — created
 
-The creation wizard is already staged with:
+Created September 10, 2026 with:
 
 - account: `Appliance RS LLC`;
 - property: `Appliance RS Website`;
@@ -17,19 +17,21 @@ The creation wizard is already staged with:
 - company size: 1-10 employees;
 - objectives: Generate leads and examine user engagement;
 - optional account data-sharing toggles: off.
+- account ID: `407663541`;
+- property ID: `553717251`;
+- web stream ID: `15756951281`;
+- measurement ID: `G-DQ5ZH4QG69`;
+- enhanced form interactions: off.
 
-Owner action:
+Remaining configuration:
 
-1. Review and accept the Google Analytics United States terms.
-2. Make the GDPR data-processing choice shown by Google.
-3. Create a Web stream for `https://appliancesc.com` named `Appliance RS Website`.
-4. Set data retention to 14 months.
-5. Disable enhanced form measurement. The site prepares an SMS, so a generic form submit must not be counted as a delivered lead.
-6. Record the GA4 property ID and `G-...` measurement ID in this register without exposing account credentials.
+1. Set event-data retention from the two-month default to 14 months.
+2. Install the GA4 configuration only through the new GTM container; do not add a duplicate direct `gtag.js`.
+3. Verify consent and non-PII custom events in Tag Assistant and GA4 DebugView.
 
 ## 2. Google Tag Manager
 
-The creation wizard is already staged with:
+The creation wizard is staged with:
 
 - account: `Appliance RS LLC`;
 - country: United States;
@@ -37,11 +39,10 @@ The creation wizard is already staged with:
 - target platform: Website;
 - anonymous data sharing: off.
 
-Owner action:
+Pending action:
 
-1. Review and accept the Tag Manager agreement.
-2. Make the GDPR data-processing choice shown by Google.
-3. Record the new `GTM-...` container ID.
+1. Confirm the final `Yes` action that creates the persistent GTM account/container.
+2. Record the new `GTM-...` container ID.
 
 After both GA4 and GTM exist, ProgressorAI can configure the tags from `docs/gtm-measurement-plan.md`, build the production site with the real public GTM ID, publish a named GTM version, and verify consent plus events in Tag Assistant.
 
