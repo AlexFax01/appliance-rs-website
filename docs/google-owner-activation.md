@@ -55,14 +55,16 @@ Published configuration:
 
 ## 3. Search Console
 
-Current state: the Domain property `appliancesc.com` was created in the client account on September 10, 2026. Ownership is still unverified because Domain properties require DNS confirmation.
+Current state: the URL-prefix property `https://appliancesc.com/` is verified and usable. On September 11, 2026, Google accepted `sitemap.xml` with status `Success`, discovered all nine canonical pages, confirmed that the homepage is already indexed, and accepted a fresh homepage indexing request.
+
+The separate Domain property `appliancesc.com` remains unverified because Domain properties require DNS confirmation. This does not block ongoing Search Console work for the canonical HTTPS site.
 
 Owner or DNS-admin action:
 
 1. Add the exact TXT value currently displayed by Search Console to the root DNS zone for `appliancesc.com` in AccuWeb.
 2. Keep the TXT record after verification.
 3. Return to Search Console and confirm ownership.
-4. Submit `https://appliancesc.com/sitemap.xml` and inspect the nine canonical URLs.
+4. After Domain verification, retain the existing URL-prefix property and use the Domain property only for broader protocol/subdomain coverage. Do not resubmit the already successful sitemap unnecessarily.
 
 The authoritative nameservers are:
 

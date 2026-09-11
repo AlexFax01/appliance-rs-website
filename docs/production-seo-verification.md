@@ -14,7 +14,9 @@ Observed on `https://appliancesc.com` on 2026-09-10, with Google linkage status 
 
 ## Google status
 
-- The Domain property `appliancesc.com` was created in Search Console for `appliancersl@gmail.com`. DNS TXT ownership verification, sitemap submission, and URL Inspection remain pending because the supplied hosting login has no DNS-zone authority.
+- The URL-prefix property `https://appliancesc.com/` is verified in Search Console for `appliancersl@gmail.com`. On September 11, 2026, `https://appliancesc.com/sitemap.xml` was submitted successfully; Search Console reported 9 discovered pages.
+- URL Inspection reported that `https://appliancesc.com/` is already in Google’s index and served through HTTPS. A fresh indexing request was accepted into Google’s priority crawl queue.
+- The separate Domain property `appliancesc.com` remains pending because the supplied hosting login has no DNS-zone authority. This does not block monitoring or indexing work for the canonical HTTPS URL-prefix property.
 - The client-owned Maps JavaScript API configuration is active on the production domain.
 - GA4 account `407663541`, property `553717251`, and web stream `G-DQ5ZH4QG69` are active. Enhanced form interactions are disabled. Client-owned GTM container `GTM-59GNC338` is live as Version 2 with the Google tag, approved non-PII event tag, and Conversion Linker.
 - Live consent QA confirmed no `_ga` or `_gcl` cookies before a choice. After `Accept all`, the consent state changed to granted and measurement cookies appeared.
