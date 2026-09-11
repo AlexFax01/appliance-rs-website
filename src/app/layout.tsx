@@ -18,6 +18,9 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? canonicalSiteUrl;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  verification: {
+    google: "WF7qLzpFsgOX6lWvPObL9WX49wcYextpvDWkwIsH4uc",
+  },
   title: { default: "Appliance RS | Appliance Repair in Upstate South Carolina", template: "%s | Appliance RS" },
   description:
     "Fast, trusted appliance repair across Upstate South Carolina. Call Appliance RS or prepare a service request by text.",

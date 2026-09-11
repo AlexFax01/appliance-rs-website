@@ -23,11 +23,12 @@ Created September 10, 2026 with:
 - measurement ID: `G-DQ5ZH4QG69`;
 - enhanced form interactions: off.
 
-Remaining configuration:
+Verified production configuration:
 
 1. Event-data and user-data retention are set to 14 months. Reset on new user activity remains enabled.
-2. Install the GA4 configuration only through the new GTM container; do not add a duplicate direct `gtag.js`.
-3. Verify consent and non-PII custom events in Tag Assistant and GA4 DebugView.
+2. GA4 is installed only through the client-owned GTM container; there is no duplicate direct `gtag.js`.
+3. Consent defaults to denied. Production requests confirmed that optional Google cookies are absent before consent and created only after `Accept all`.
+4. Tag Assistant and a production request trace confirmed the approved non-PII interaction pipeline, including `request_repair_click` and `map_open`.
 
 ## 2. Google Tag Manager
 
@@ -43,32 +44,31 @@ Created September 10, 2026 with:
 - public ID: `GTM-59GNC338`;
 - GDPR data-processing terms: accepted.
 
-Remaining configuration:
+Published configuration:
 
-1. Configure the Google tag and approved non-PII event tags from `docs/gtm-measurement-plan.md`.
-2. Validate consent states and one-time event delivery in Tag Assistant and GA4 DebugView.
-3. Obtain approval immediately before publishing the first named container version.
-
-After both GA4 and GTM exist, ProgressorAI can configure the tags from `docs/gtm-measurement-plan.md`, build the production site with the real public GTM ID, publish a named GTM version, and verify consent plus events in Tag Assistant.
+1. Google tag: `Google tag - Appliance RS GA4`.
+2. Approved event tag: `GA4 events - approved non-PII`.
+3. Conversion Linker: `Conversion Linker - All Pages`.
+4. First live release: Version 2, `2026-09-10 Appliance RS consent and lead-intent measurement`.
+5. Consent and event execution were verified in Tag Assistant; the production network trace also confirmed custom events in the GA4 batched POST payload.
 
 ## 3. Search Console
 
-Current state: the client account does not have verified access to the existing Domain property `appliancesc.com`.
+Current state: the Domain property `appliancesc.com` was created in the client account on September 10, 2026. Ownership is still unverified because Domain properties require DNS confirmation.
 
 Owner or DNS-admin action:
 
-1. Start ownership verification for the Domain property in Search Console.
-2. Copy the exact `google-site-verification=...` TXT value shown by Google.
-3. Add it to the root DNS zone for `appliancesc.com` in AccuWeb.
-4. Keep the TXT record after verification.
-5. Return to Search Console and confirm ownership.
+1. Add the exact TXT value currently displayed by Search Console to the root DNS zone for `appliancesc.com` in AccuWeb.
+2. Keep the TXT record after verification.
+3. Return to Search Console and confirm ownership.
+4. Submit `https://appliancesc.com/sitemap.xml` and inspect the nine canonical URLs.
 
 The authoritative nameservers are:
 
 - `ns1.ssdlinux35.accuwebhosting.com`
 - `ns2.ssdlinux35.accuwebhosting.com`
 
-FTPS access is sufficient to publish the website but is not sufficient to edit DNS. After ownership is confirmed, submit `https://appliancesc.com/sitemap.xml` and inspect the nine canonical URLs listed in the README.
+FTPS access is sufficient to publish the website but is not sufficient to edit DNS. The live homepage also carries the supplied Google verification meta marker as an auxiliary recovery method for a URL-prefix property; it does not replace DNS verification for the required Domain property.
 
 ## 4. Security and advertising ownership
 

@@ -13,9 +13,11 @@ Observed on `https://appliancesc.com` on 2026-09-10.
 
 ## Google status
 
-- Search Console ownership is not yet verified for `appliancersl@gmail.com`; sitemap submission and URL Inspection remain pending.
+- The Domain property `appliancesc.com` was created in Search Console for `appliancersl@gmail.com`. DNS TXT ownership verification, sitemap submission, and URL Inspection remain pending because the supplied hosting login has no DNS-zone authority.
 - The client-owned Maps JavaScript API configuration is active on the production domain.
-- GA4 account `407663541`, property `553717251`, and web stream `G-DQ5ZH4QG69` are active. Enhanced form interactions are disabled. Client-owned GTM container `GTM-59GNC338` is created but intentionally remains unpublished until its consent-aware tags and non-PII events are validated.
+- GA4 account `407663541`, property `553717251`, and web stream `G-DQ5ZH4QG69` are active. Enhanced form interactions are disabled. Client-owned GTM container `GTM-59GNC338` is live as Version 2 with the Google tag, approved non-PII event tag, and Conversion Linker.
+- Live consent QA confirmed no `_ga` or `_gcl` cookies before a choice. After `Accept all`, the consent state changed to granted and measurement cookies appeared.
+- Tag Assistant showed the custom GA4 event tag executed for `request_repair_click`. A separate production browser trace confirmed `request_repair_click` and `map_open` in the GA4 batched POST payload; these events contained only allow-listed interaction metadata, not form contact details.
 - The Google Ads `Calls from ads` conversion is configured as the primary phone-lead action with a 60-second threshold. Website intent events remain planned as secondary observation events.
 - The Google Business Profile service catalog shows the main appliance-repair services. The newly added garbage-disposal service is still shown as submitted for review.
 
