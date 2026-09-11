@@ -1,6 +1,6 @@
 # Appliance RS Google resource register
 
-Last updated: 2026-09-10
+Last updated: 2026-09-11
 
 Canonical owner: `appliancersl@gmail.com`
 Agency access: named ProgressorAI account only; never a shared password.
@@ -8,8 +8,8 @@ Agency access: named ProgressorAI account only; never a shared password.
 | Resource | Intended name / identifier | Owner | Current release status |
 | --- | --- | --- | --- |
 | Website | `https://appliancesc.com/` | Appliance RS LLC | Production hosting; nine canonical URLs prepared |
-| Google Business Profile | Appliance RS LLC (`/g/11z7t4g7sf`) | `appliancersl@gmail.com` | Verified profile; HTTPS/UTM, public-chat removal, repair attribute, and disposal service submitted for Google review September 10, 2026 |
-| Google Ads | `293-049-5593` | `appliancersl@gmail.com` | Existing; Calls from ads is the 60-second primary action; inactive website-call duplicate moved to secondary; budgets and bidding unchanged |
+| Google Business Profile | Appliance RS LLC (`/g/11z7t4g7sf`) | `appliancersl@gmail.com` | Verified profile; HTTPS/UTM, public-chat removal, repair attribute, and disposal service submitted for Google review September 10, 2026; direct GA4 profile linkage not yet completed |
+| Google Ads | `293-049-5593` | `appliancersl@gmail.com` | Linked to GA4 property `553717251` on September 11, 2026; auto-tagging enabled; Calls from ads is the 60-second primary action; inactive website-call duplicate moved to secondary; budgets and bidding unchanged |
 | Search Console | Domain property `appliancesc.com` | `appliancersl@gmail.com` | Created September 10, 2026; verification remains pending because a Domain property requires the displayed DNS TXT record |
 | GA4 account | Appliance RS LLC (`407663541`) | `appliancersl@gmail.com` | Created September 10, 2026; United States terms and Google Ads data-processing terms accepted |
 | GA4 property | Appliance RS Website (`553717251`) | `appliancersl@gmail.com` | Active; United States, Eastern Time, USD, Home & Garden, 1-10 employees, lead-generation and engagement objectives |
@@ -42,12 +42,14 @@ Agency access: named ProgressorAI account only; never a shared password.
 ## Owner-action boundary observed September 10, 2026
 
 - GA4 account, property, and web stream are active. Event-data and user-data retention are both set to 14 months as of September 10, 2026; reset on new user activity remains enabled.
+- GA4 property `553717251` is linked to the client Google Ads account `293-049-5593` as of September 11, 2026. The setup result showed `Link created`, and auto-tagging was enabled. Google notes that linked Ads data can take up to 24 hours to appear.
 - GTM Version 2 is live. Tag Assistant shows `GA4 events - approved non-PII` executed on `request_repair_click`; an independent production request trace confirmed batched `request_repair_click` and `map_open` hits to `G-DQ5ZH4QG69` after consent.
 - Before consent, the production browser set no `_ga` or `_gcl` cookies. After `Accept all`, the consent state changed to granted and GA4/Conversion Linker cookies were created.
 - The Domain property now exists in the client account, but Search Console cannot expose sitemap submission or URL Inspection until the DNS TXT record is added and ownership is confirmed.
 - The authoritative nameservers are `ns1.ssdlinux35.accuwebhosting.com` and `ns2.ssdlinux35.accuwebhosting.com`. The supplied FTPS login does not authenticate to cPanel, so it does not provide DNS-zone authority. A DNS-capable AccuWeb login or owner-added TXT record is required.
 - The live site is measuring through the client-owned GTM container. Do not add a duplicate direct `gtag.js` installation.
+- The optional direct GA4-to-Business-Profile link remains uncreated. The only eligible managed profile shown was `Appliance RS LLC`; no other profile was selected or linked. This does not block the website, Business Profile, Maps, GTM, GA4, or Ads measurement already in production.
 
 ## Release identifiers to record after creation
 
-Record the eventual Search Console verification date, Ads linkage dates, and the name of each delegated user. Never paste a secret key value into this document.
+Record the eventual Search Console verification date, Business Profile linkage date, and the name of each delegated user. Never paste a secret key value into this document.

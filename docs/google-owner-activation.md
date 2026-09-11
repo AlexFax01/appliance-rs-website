@@ -1,6 +1,6 @@
 # Appliance RS Google owner activation handoff
 
-Last checked: 2026-09-10
+Last checked: 2026-09-11
 
 These are the remaining owner-only actions. Complete them while signed in as `appliancersl@gmail.com`. Do not use a shared agency account and do not send passwords or recovery codes by email or chat.
 
@@ -29,6 +29,7 @@ Verified production configuration:
 2. GA4 is installed only through the client-owned GTM container; there is no duplicate direct `gtag.js`.
 3. Consent defaults to denied. Production requests confirmed that optional Google cookies are absent before consent and created only after `Accept all`.
 4. Tag Assistant and a production request trace confirmed the approved non-PII interaction pipeline, including `request_repair_click` and `map_open`.
+5. GA4 property `553717251` was linked to Google Ads account `293-049-5593` on September 11, 2026. Auto-tagging is enabled; linked data may take up to 24 hours to appear.
 
 ## 2. Google Tag Manager
 
@@ -77,3 +78,9 @@ FTPS access is sufficient to publish the website but is not sufficient to edit D
 - Keep the existing Google Ads budget and bidding unchanged until there are at least 14 days of clean measurement.
 - The confirmed primary Ads conversion remains `Calls from ads`: phone-lead primary action, 60-second call threshold, conversion type ID `7653794562`.
 - Add ProgressorAI later through named delegated roles only: GA4 Editor, GTM Publish, Search Console Full user or delegated owner, Google Ads Standard, and the minimum Maps/API role needed.
+
+## 5. Optional Google Business Profile integration
+
+GA4 currently shows one eligible managed profile: `Appliance RS LLC`. The direct GA4-to-Business-Profile link was not finalized because the Google admin interface repeatedly shifted focus between open client tabs during the final confirmation flow. No unrelated profile was selected and no advertising setting was changed.
+
+This link is useful for consolidated reporting but is not required for the website, the public Business Profile, the production Google map, GTM events, GA4 collection, or the existing GA4-to-Google-Ads link. It can be completed later from GA4: **Admin → Product links → Google Business Profile links → Link → Appliance RS LLC**.
