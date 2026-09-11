@@ -41,7 +41,7 @@ Agency access: named ProgressorAI account only; never a shared password.
 
 ## Owner-action boundary observed September 10, 2026
 
-- GA4 account, property, and web stream are active. Event-data retention still needs to be changed from the two-month default to 14 months; the client profile currently presents an optional email-subscription choice before that setting can be saved.
+- GA4 account, property, and web stream are active. Event-data and user-data retention are both set to 14 months as of September 10, 2026; reset on new user activity remains enabled.
 - GTM is paused at the Tag Manager terms dialog. The owner must review and accept the agreement and make the GDPR data-processing choice.
 - Search Console cannot yet expose a sitemap or URL Inspection because `appliancersl@gmail.com` is not a verified user for the domain property.
 - The authoritative nameservers are `ns1.ssdlinux35.accuwebhosting.com` and `ns2.ssdlinux35.accuwebhosting.com`. The supplied FTPS login does not authenticate to cPanel, so it does not provide DNS-zone authority. A DNS-capable AccuWeb login or owner-added TXT record is required.

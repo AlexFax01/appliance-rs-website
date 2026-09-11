@@ -25,7 +25,7 @@ Created September 10, 2026 with:
 
 Remaining configuration:
 
-1. Set event-data retention from the two-month default to 14 months.
+1. Event-data and user-data retention are set to 14 months. Reset on new user activity remains enabled.
 2. Install the GA4 configuration only through the new GTM container; do not add a duplicate direct `gtag.js`.
 3. Verify consent and non-PII custom events in Tag Assistant and GA4 DebugView.
 
